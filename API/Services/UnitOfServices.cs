@@ -17,28 +17,37 @@ public class UnitOfServices : IUnitOfServices, IDisposable
         Also, for every repo or service inherit the base service or base repo as well 
         as their respective interfaces
     */
-   private Dictionary<Type, object> _services;
-   private readonly IServiceProvider _serviceProvider;
-   private bool _disposed;
+    public IAllergyService AllergyService { get; }
+    public IIngredientCategoryService IngredientCategoryService { get; }
+    public IIngredientService IngredientService { get; }
+    private Dictionary<Type, object> _services;
+    private readonly IServiceProvider _serviceProvider;
+    private bool _disposed;
 
-   public UnitOfServices(IServiceProvider serviceProvider)
-   {
+    public UnitOfServices(IServiceProvider serviceProvider,
+        IAllergyService allergyService,
+        IIngredientCategoryService ingredientCategoryService,
+        IIngredientService ingredientService)
+    {
         _serviceProvider = serviceProvider;
+        AllergyService = allergyService;
+        IngredientCategoryService = ingredientCategoryService;
+        IngredientService = ingredientService;
         _services = new Dictionary<Type, object>();
-   }
+    }
 
     public IBaseService<TEntity, TDTO> Service<TEntity, TDTO>()
          where TEntity : class
          where TDTO : class
     {
         var type = typeof(TEntity);
-    
+
         if (!_services.ContainsKey(type))
         {
-            var serviceType = _serviceProvider.GetService(typeof(IBaseService<TEntity,TDTO>));
+            var serviceType = _serviceProvider.GetService(typeof(IBaseService<TEntity, TDTO>));
             _services[type] = serviceType!;
         }
-    
+
         return (IBaseService<TEntity, TDTO>)_services[type];
     }
 
@@ -59,5 +68,5 @@ public class UnitOfServices : IUnitOfServices, IDisposable
 
             _disposed = true;
         }
-    } 
+    }
 }
