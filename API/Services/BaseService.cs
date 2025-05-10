@@ -4,6 +4,8 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using API.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Services
 {
@@ -20,7 +22,7 @@ namespace API.Services
             _mapper = mapper;
         }
 
-        public virtual async Task<TDTO> Create(TDTO dto)
+        public virtual async Task<ActionResult<TDTO>> Create(TDTO dto)
         {
 
             var entity = _mapper.Map<TEntity>(dto);
@@ -31,11 +33,11 @@ namespace API.Services
             return _mapper.Map<TDTO>(entity);
         }
 
-        public virtual async Task<TDTO> Update(int id, TDTO dto)
+        public virtual async Task<ActionResult<TDTO>> Update(int id, TDTO dto)
         {
             var existingEntity = await _unitOfWork.Repository<TEntity>().GetByIdAsync(id);
             if (existingEntity == null)
-                throw new KeyNotFoundException($"Entity with ID {id} not found");
+                return new BadRequestObjectResult($"Entity not found");
             
             _mapper.Map(dto, existingEntity);
             
@@ -45,7 +47,7 @@ namespace API.Services
             return _mapper.Map<TDTO>(existingEntity);
         }
 
-        public virtual async Task<bool> Delete(int id)
+        public virtual async Task<ActionResult<bool>> Delete(int id)
         {
             var entity = await _unitOfWork.Repository<TEntity>().GetByIdAsync(id);
             if (entity == null)
@@ -56,26 +58,26 @@ namespace API.Services
             return await _unitOfWork.SaveAsync();
         }
 
-        public virtual async Task<TDTO> GetByIdAsync(int id)
+        public virtual async Task<ActionResult<TDTO>> GetByIdAsync(int id)
         {
             var entity = await _unitOfWork.Repository<TEntity>().GetByIdAsync(id);
             if (entity == null)
-                return null;
+                return new BadRequestObjectResult($"Entity with ID {id} not found");
             
             return _mapper.Map<TDTO>(entity);
         }
 
-        public virtual async Task<ICollection<TDTO>> GetAllAsync()
+        public virtual async Task<ActionResult<ICollection<TDTO>>> GetAllAsync()
         {
             var entities = await _unitOfWork.Repository<TEntity>().GetAllAsync();
-            
-            return _mapper.Map<ICollection<TDTO>>(entities);
+            var mappedEntities = _mapper.Map<ICollection<TDTO>>(entities);
+            return new OkObjectResult(mappedEntities);
         }
         
-        public virtual async Task<ICollection<TDTO>> FindAsync(Expression<Func<TEntity, bool>> predicate)
+        public virtual async Task<ActionResult<ICollection<TDTO>>> FindAsync(Expression<Func<TEntity, bool>> predicate)
         {
             var entities = await _unitOfWork.Repository<TEntity>().FindAsync(predicate);   
-            return _mapper.Map<ICollection<TDTO>>(entities);
+            return new OkObjectResult(_mapper.Map<ICollection<TDTO>>(entities));
         }
     }
 }

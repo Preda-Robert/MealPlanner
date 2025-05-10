@@ -4,6 +4,9 @@ namespace API.Interfaces;
 
 public interface IUnitOfServices : IDisposable
 {
+    IAllergyService AllergyService { get; }
+    IIngredientCategoryService IngredientCategoryService { get; }
+    IIngredientService IngredientService { get; }
     IBaseService<TEntity, TDTO> Service<TEntity, TDTO>()
         where TEntity : class
         where TDTO : class;

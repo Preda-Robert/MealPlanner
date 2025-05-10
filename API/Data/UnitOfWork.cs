@@ -19,18 +19,26 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         Also, for every repo or service inherit the base service or base repo as well 
         as their respective interfaces
     */
+    public IAllergyRepository AllergyRepository { get; }
+    public IIngredientCategoryRepository IngredientCategoryRepository { get; }
+    public IIngredientRepository IngredientRepository { get; }
     private readonly DataContext _context;
     private Dictionary<Type, object> _repositories;
     private readonly IServiceProvider _serviceProvider;
     private bool _disposed;
 
-    public UnitOfWork(DataContext context, IServiceProvider serviceProvider)
+    public UnitOfWork(DataContext context, IServiceProvider serviceProvider,
+        IAllergyRepository allergyRepository,
+        IIngredientCategoryRepository ingredientCategoryRepository,
+        IIngredientRepository ingredientRepository)
     {
-        _serviceProvider = serviceProvider;
-        _repositories = new Dictionary<Type, object>();
         _context = context;
+        _serviceProvider = serviceProvider;
+        AllergyRepository = allergyRepository;
+        IngredientCategoryRepository = ingredientCategoryRepository;
+        IngredientRepository = ingredientRepository;
+        _repositories = new Dictionary<Type, object>();
     }
-
     public IBaseRepository<TEntity> Repository<TEntity>() where TEntity : class
     {
         var type = typeof(TEntity);
