@@ -5,16 +5,7 @@ namespace API.Entities;
 
 public class MealPlanRecipe
     {
-        [Key]
-        public int MealPlanRecipeId { get; set; }
-        public required string MealType { get; set; }
-        public DateTime PlannedDate { get; set; }
-        public int MealPlanId { get; set; }
-
-        [ForeignKey("MealPlanId")]
-        public MealPlan MealPlan { get; set; } = null!;
-        public int RecipeId { get; set; }
-        
-        [ForeignKey("RecipeId")]
+        public int Id { get; set; }
         public Recipe Recipe { get; set; } = null!;
+        public ServingType ServingType { get; set; } = null!;
     }

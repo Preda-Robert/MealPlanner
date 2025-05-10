@@ -6,12 +6,9 @@ namespace API.Entities;
 
     public class ShoppingList
     {
-        [Key]
-        public int ShoppingListId { get; set; }
+        public int Id { get; set; }
         public DateTime CreatedDate { get; set; }
-
         public int UserId { get; set; }
-        [ForeignKey("UserId")]
-        public virtual ApplicationUser User { get; set; } = null!;
-        public virtual ICollection<ShoppingListItem> Items { get; set; } = [];
+        public ApplicationUser User { get; set; } = null!;
+        public ICollection<ShoppingListItem> Items { get; set; } = [];
     }
