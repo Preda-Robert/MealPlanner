@@ -1,4 +1,7 @@
 using API.Data;
+using API.Interfaces;
+using API.Repositories;
+using API.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Extensions;
@@ -14,13 +17,12 @@ public static class ApplicationServiceExtensions
     });
     services.AddCors();
     services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-    // services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
-    // services.AddScoped<IPhotoService, PhotoService>();
-    // services.AddScoped<IUserRepository, UserRepository>();
-    // services.AddScoped<IItemRepository, ItemRepository>();
-    // services.AddScoped<IPostRepository, PostRepository>();    
-    // services.AddScoped<ICategoryRepository, CategoryRepository>();
-    // services.AddScoped<IUnitOfWork, UnitOfWork>();
+    // Services
+    services.AddScoped(typeof(IBaseService<,>), typeof(BaseService<,>));
+    services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+    // Repositories
+    services.AddScoped<IUnitOfWork, UnitOfWork>();
+    services.AddScoped<IUnitOfServices, UnitOfServices>();
     return services;
 }
 }

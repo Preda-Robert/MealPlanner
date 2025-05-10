@@ -12,7 +12,7 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<Applicati
     public DbSet<Cookware> Cookwares { get; set; }
     public DbSet<Recipe> Recipes { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
-    public DbSet<DietaryPreference> DietaryPreferences { get; set; }
+    public DbSet<DietaryPreferences> DietaryPreferences { get; set; }
     public DbSet<MealPlan> MealPlans { get; set; }
     public DbSet<Photo> Photos { get; set; }
 
