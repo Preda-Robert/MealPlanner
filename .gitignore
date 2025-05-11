@@ -487,3 +487,7 @@ $RECYCLE.BIN/
 ssl/
 *.key
 *.pem
+
+# Secrets files
+**/appsettings.json
+**/appsettings.Development.json
