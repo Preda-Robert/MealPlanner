@@ -20,6 +20,11 @@ public class UnitOfServices : IUnitOfServices, IDisposable
     public IAllergyService AllergyService { get; }
     public IIngredientCategoryService IngredientCategoryService { get; }
     public IIngredientService IngredientService { get; }
+    public IRecipeService RecipeService { get; }
+    public IServingTypeService ServingTypeService { get; }
+    public ICookwareService CookwareService { get; }
+    public ITokenService TokenService { get; }
+    public IUserService UserService { get; }
     private Dictionary<Type, object> _services;
     private readonly IServiceProvider _serviceProvider;
     private bool _disposed;
@@ -27,12 +32,22 @@ public class UnitOfServices : IUnitOfServices, IDisposable
     public UnitOfServices(IServiceProvider serviceProvider,
         IAllergyService allergyService,
         IIngredientCategoryService ingredientCategoryService,
-        IIngredientService ingredientService)
+        IIngredientService ingredientService,
+        IRecipeService recipeService,
+        IServingTypeService servingTypeService,
+        ICookwareService cookwareService,
+        ITokenService tokenService,
+        IUserService userService)
     {
         _serviceProvider = serviceProvider;
         AllergyService = allergyService;
         IngredientCategoryService = ingredientCategoryService;
         IngredientService = ingredientService;
+        ServingTypeService = servingTypeService;
+        RecipeService = recipeService;
+        CookwareService = cookwareService;
+        TokenService = tokenService;
+        UserService = userService;
         _services = new Dictionary<Type, object>();
     }
 

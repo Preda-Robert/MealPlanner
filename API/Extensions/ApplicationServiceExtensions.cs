@@ -24,13 +24,23 @@ public static class ApplicationServiceExtensions
     services.AddScoped<IAllergyService, AllergyService>();
     services.AddScoped<IIngredientService, IngredientService>();
     services.AddScoped<IIngredientCategoryService, IngredientCategoryService>();
+    services.AddScoped<IRecipeService, RecipeService>();
+    services.AddScoped<IServingTypeService, ServingTypeService>();
+    services.AddScoped<ICookwareService, CookwareService>();
+    services.AddScoped<ITokenService, TokenService>();
+    services.AddScoped<IUserService, UserService>();
+    services.AddScoped<IEmailService, GmailService>();
     // Repositories
     services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-    services.AddScoped<IUnitOfWork, UnitOfWork>();
-    services.AddScoped<IUnitOfServices, UnitOfServices>();
     services.AddScoped<IAllergyRepository, AllergyRepository>();
     services.AddScoped<IIngredientRepository, IngredientRepository>();
     services.AddScoped<IIngredientCategoryRepository, IngredientCategoryRepository>();
+    services.AddScoped<IRecipeRepository, RecipeRepository>();
+    services.AddScoped<IServingTypeRepository, ServingTypeRepository>();
+    services.AddScoped<ICookwareRepository, CookwareRepository>();
+    services.AddScoped<IUnitOfWork, UnitOfWork>();
+    services.AddScoped<IUnitOfServices, UnitOfServices>();
+    
     return services;
 }
 }

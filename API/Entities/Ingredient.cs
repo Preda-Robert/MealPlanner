@@ -12,4 +12,6 @@ public class Ingredient
     public IngredientMeasurementType MeasurementType { get; set; }
     public float Calories { get; set; }
     public Photo? Photo { get; set; } = null!;
+
+    public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = null!;
 }

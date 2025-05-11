@@ -22,6 +22,9 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     public IAllergyRepository AllergyRepository { get; }
     public IIngredientCategoryRepository IngredientCategoryRepository { get; }
     public IIngredientRepository IngredientRepository { get; }
+    public IRecipeRepository RecipeRepository { get; }
+    public IServingTypeRepository ServingTypeRepository { get; }
+    public ICookwareRepository CookwareRepository { get; }
     private readonly DataContext _context;
     private Dictionary<Type, object> _repositories;
     private readonly IServiceProvider _serviceProvider;
@@ -30,13 +33,19 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     public UnitOfWork(DataContext context, IServiceProvider serviceProvider,
         IAllergyRepository allergyRepository,
         IIngredientCategoryRepository ingredientCategoryRepository,
-        IIngredientRepository ingredientRepository)
+        IIngredientRepository ingredientRepository,
+        IRecipeRepository recipeRepository,
+        IServingTypeRepository servingTypeRepository,
+        ICookwareRepository cookwareRepository)
     {
         _context = context;
         _serviceProvider = serviceProvider;
         AllergyRepository = allergyRepository;
         IngredientCategoryRepository = ingredientCategoryRepository;
         IngredientRepository = ingredientRepository;
+        RecipeRepository = recipeRepository;
+        ServingTypeRepository = servingTypeRepository;
+        CookwareRepository = cookwareRepository;
         _repositories = new Dictionary<Type, object>();
     }
     public IBaseRepository<TEntity> Repository<TEntity>() where TEntity : class

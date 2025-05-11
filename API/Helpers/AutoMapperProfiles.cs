@@ -1,4 +1,5 @@
 using API.DTO;
+using API.DTOs;
 using API.Entities;
 using API.Extensions;
 using AutoMapper;
@@ -18,7 +19,21 @@ public class AutoMapperProfiles: Profile
         CreateMap<IngredientCategory, IngredientCategoryDTO>();
         CreateMap<IngredientCategoryDTO, IngredientCategory>();
 
+        CreateMap<ServingType, ServingTypeDTO>();
+        CreateMap<ServingTypeDTO, ServingType>();
+
         CreateMap<Ingredient, IngredientDTO>();
         CreateMap<IngredientDTO, Ingredient>();
+
+        CreateMap<Recipe, RecipeDTO>();
+        CreateMap<RecipeDTO, Recipe>();
+
+        CreateMap<RecipeIngredient, RecipeIngredientDTO>();
+        CreateMap<RecipeIngredientDTO, RecipeIngredient>();
+
+        CreateMap<RecipeInstruction, RecipeInstructionDTO>();
+        CreateMap<RecipeInstructionDTO, RecipeInstruction>();
+
+        CreateMap<RegisterDTO, ApplicationUser>();
     }
 }

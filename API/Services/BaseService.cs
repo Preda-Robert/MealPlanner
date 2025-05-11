@@ -28,8 +28,9 @@ namespace API.Services
             var entity = _mapper.Map<TEntity>(dto);
 
             await _unitOfWork.Repository<TEntity>().AddAsync(entity);
-            await _unitOfWork.SaveAsync();
-            
+            var result = await _unitOfWork.SaveAsync();
+            if (result == false)
+                return new BadRequestObjectResult("Failed to create entity");
             return _mapper.Map<TDTO>(entity);
         }
 
@@ -42,7 +43,9 @@ namespace API.Services
             _mapper.Map(dto, existingEntity);
             
             _unitOfWork.Repository<TEntity>().Update(existingEntity);
-            await _unitOfWork.SaveAsync();
+            var result = await _unitOfWork.SaveAsync();
+            if (result == false)
+                return new BadRequestObjectResult("Failed to update entity");
             
             return _mapper.Map<TDTO>(existingEntity);
         }

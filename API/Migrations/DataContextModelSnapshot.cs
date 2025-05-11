@@ -80,6 +80,10 @@ namespace API.Migrations
                     b.Property<int>("DietaryPreferencesId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
@@ -156,7 +160,7 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Entities.Cookware", b =>
                 {
-                    b.Property<int>("CookwareId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -171,11 +175,7 @@ namespace API.Migrations
                     b.Property<int?>("PhotoId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("CookwareId");
+                    b.HasKey("Id");
 
                     b.HasIndex("PhotoId");
 
@@ -343,9 +343,8 @@ namespace API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Difficulty")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Difficulty")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -354,23 +353,17 @@ namespace API.Migrations
                     b.Property<int?>("PhotoId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("PreparationTime")
-                        .HasColumnType("INTEGER");
-
                     b.Property<float>("Rating")
                         .HasColumnType("REAL");
 
-                    b.Property<int>("Servings")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UserId")
+                    b.Property<int>("ServingTypeId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PhotoId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ServingTypeId");
 
                     b.ToTable("Recipes");
                 });
@@ -410,10 +403,6 @@ namespace API.Migrations
 
                     b.Property<int>("RecipeId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -455,7 +444,6 @@ namespace API.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("NumberOfServings")
@@ -702,7 +690,7 @@ namespace API.Migrations
                         .HasForeignKey("MealPlanId");
 
                     b.HasOne("API.Entities.Recipe", "Recipe")
-                        .WithMany("MealPlanRecipes")
+                        .WithMany()
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -724,27 +712,27 @@ namespace API.Migrations
                         .WithMany()
                         .HasForeignKey("PhotoId");
 
-                    b.HasOne("API.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("API.Entities.ServingType", "ServingType")
+                        .WithMany("Recipes")
+                        .HasForeignKey("ServingTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Photo");
 
-                    b.Navigation("User");
+                    b.Navigation("ServingType");
                 });
 
             modelBuilder.Entity("API.Entities.RecipeCookware", b =>
                 {
                     b.HasOne("API.Entities.Cookware", "Cookware")
-                        .WithMany("RecipeCookwares")
+                        .WithMany()
                         .HasForeignKey("CookwareId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("API.Entities.Recipe", "Recipe")
-                        .WithMany()
+                        .WithMany("Cookware")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -757,7 +745,7 @@ namespace API.Migrations
             modelBuilder.Entity("API.Entities.RecipeIngredient", b =>
                 {
                     b.HasOne("API.Entities.Ingredient", "Ingredient")
-                        .WithMany()
+                        .WithMany("RecipeIngredients")
                         .HasForeignKey("IngredientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -864,14 +852,14 @@ namespace API.Migrations
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("API.Entities.Cookware", b =>
-                {
-                    b.Navigation("RecipeCookwares");
-                });
-
             modelBuilder.Entity("API.Entities.DietaryPreferences", b =>
                 {
                     b.Navigation("Allergies");
+                });
+
+            modelBuilder.Entity("API.Entities.Ingredient", b =>
+                {
+                    b.Navigation("RecipeIngredients");
                 });
 
             modelBuilder.Entity("API.Entities.IngredientCategory", b =>
@@ -886,11 +874,16 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Entities.Recipe", b =>
                 {
+                    b.Navigation("Cookware");
+
                     b.Navigation("Ingredients");
 
                     b.Navigation("Instructions");
+                });
 
-                    b.Navigation("MealPlanRecipes");
+            modelBuilder.Entity("API.Entities.ServingType", b =>
+                {
+                    b.Navigation("Recipes");
                 });
 
             modelBuilder.Entity("API.Entities.ShoppingList", b =>

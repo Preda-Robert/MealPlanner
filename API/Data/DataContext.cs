@@ -31,5 +31,41 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<Applicati
             .WithOne(u => u.Role)
             .HasForeignKey(ur => ur.RoleId)
             .IsRequired();
+
+        builder.Entity<Recipe>()
+        .HasMany(r => r.Ingredients)
+            .WithOne(ri => ri.Recipe)
+            .HasForeignKey(ri => ri.RecipeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Recipe>()
+            .HasMany(r => r.Instructions)
+            .WithOne(rc => rc.Recipe)
+            .HasForeignKey(rc => rc.RecipeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Recipe>()
+            .HasOne(r => r.ServingType)
+            .WithMany(s => s.Recipes)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<ServingType>()
+            .HasMany(st => st.Recipes)
+            .WithOne(r => r.ServingType)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Ingredient>()
+            .HasMany(i => i.RecipeIngredients)
+            .WithOne(ri => ri.Ingredient)
+            .HasForeignKey(ri => ri.IngredientId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Recipe>()
+            .HasMany(r => r.Cookware)
+            .WithOne(rc => rc.Recipe)
+            .HasForeignKey(rc => rc.RecipeId)
+            .OnDelete(DeleteBehavior.Cascade);
+            
+            
     }
 }
