@@ -16,17 +16,17 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAllergy(AllergyDTO allergyDTO)
+        public async Task<ActionResult<AllergyDTO>> CreateAllergy(AllergyDTO allergyDTO)
         {
-            var allergyServiceResult = await _unitOfServices.Service<Allergy, AllergyDTO>().Create(allergyDTO);
-            return allergyServiceResult != null ? Ok(allergyServiceResult) : BadRequest("Error creating allergy");
+            var allergyServiceResult = await _unitOfServices.AllergyService.Create(allergyDTO);
+            return allergyServiceResult;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllergies()
+        public async Task<ActionResult<ICollection<AllergyDTO>>> GetAllergies()
         {
-            var allergiesServiceResult = await _unitOfServices.Service<Allergy, AllergyDTO>().GetAllAsync();
-            return allergiesServiceResult != null ? Ok(allergiesServiceResult) : NotFound("No allergies found");
+            var allergiesServiceResult = await _unitOfServices.AllergyService.GetAllAsync();
+            return allergiesServiceResult;
         }
 
 

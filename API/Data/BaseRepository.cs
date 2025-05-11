@@ -22,7 +22,7 @@ namespace API.Repositories
 
         public async Task<TEntity> GetByIdAsync(int id)
         {
-            return await _dbSet.FindAsync(id);
+            return await _dbSet.FindAsync(id) ?? throw new Exception($"Entity with ID {id} not found");
         }
 
         public async Task<ICollection<TEntity>> GetAllAsync()

@@ -11,5 +11,14 @@ public class AutoMapperProfiles: Profile
     {
         CreateMap<Allergy, AllergyDTO>();
         CreateMap<AllergyDTO, Allergy>();
+
+        CreateMap<Photo, PhotoDTO>();
+        CreateMap<PhotoDTO, Photo>();
+
+        CreateMap<IngredientCategory, IngredientCategoryDTO>();
+        CreateMap<IngredientCategoryDTO, IngredientCategory>();
+
+        CreateMap<Ingredient, IngredientDTO>();
+        CreateMap<IngredientDTO, Ingredient>();
     }
 }
