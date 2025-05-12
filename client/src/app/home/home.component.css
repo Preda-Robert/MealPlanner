@@ -1,0 +1,15 @@
+:host {
+  display: block;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+
+.card {
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+}

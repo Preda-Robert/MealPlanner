@@ -1,0 +1,82 @@
+<div class="container py-5 min-vh-100">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-5">
+      <form [formGroup]="authForm" (ngSubmit)="onSubmit()" autocomplete="off" class="bg-white p-4 rounded shadow">
+
+        <div class="d-flex align-items-center mb-4">
+          <a class="btn btn-link text-decoration-none me-2" routerLink="/" routerLinkActive="true">
+            <i class="fa fa-arrow-left"></i>
+          </a>
+          @if(isLoginMode) {
+          <h2 class="mb-0">Login</h2>
+          }@else {
+          <h2 class="mb-0">Register</h2>
+          }
+        </div>
+
+        <hr class="mb-4">
+        @if(isLoginMode) {
+        <div class="mb-3">
+          <app-text-input [formControl]="$any(authForm.controls['usernameOrEmail'])"
+            [label]="'Username or Email'"></app-text-input>
+        </div>
+        <div class="mb-3">
+          <app-text-input [formControl]="$any(authForm.controls['password'])" [label]="'Password'"
+            [type]="'password'"></app-text-input>
+        </div>
+        }@else {
+        <div class="mb-3">
+          <app-text-input [formControl]="$any(authForm.controls['username'])" [label]="'username'"></app-text-input>
+        </div>
+        <div class="mb-3">
+          <app-text-input [formControl]="$any(authForm.controls['displayName'])"
+            [label]="'display name'"></app-text-input>
+        </div>
+        <div class="mb-3">
+          <app-text-input [formControl]="$any(authForm.controls['email'])" [label]="'email'"
+            [type]="'email'"></app-text-input>
+        </div>
+        <div class="mb-3">
+          <app-text-input [formControl]="$any(authForm.controls['password'])" [label]="'password'"
+            [type]="'password'"></app-text-input>
+        </div>
+        <div class="mb-3">
+          <app-text-input [formControl]="$any(authForm.controls['confirmPassword'])" [label]="'confirm password'"
+            [type]="'password'"></app-text-input>
+        </div>
+        }
+        <div class="mt-4">
+          <p class="text-center mb-3">- OR -</p>
+          <div class="d-flex justify-content-center gap-3">
+            <button [disabled]="!authForm.valid" class="btn btn-success px-4" type="submit">
+              <i class="fa" [ngClass]="isLoginMode ? 'fa-sign-in' : 'fa-user-plus'"></i>
+              {{ isLoginMode ? 'Login' : 'Register' }}
+            </button>
+
+            <button type="button" class="btn btn-outline-danger" (click)="loginWithGoogle()">
+              <i class="fa fa-google me-2"></i> Continue with Google
+            </button>
+          </div>
+        </div>
+
+        @if(validationErrors && validationErrors.length > 0) {
+        <div class="alert alert-danger mt-3">
+          <ul class="mb-0">
+            @for(error of validationErrors; track $index) {
+            <li>{{ error }}</li>
+            }
+          </ul>
+        </div>
+        }
+
+        <p class="text-center mt-3 mb-0">
+          {{ isLoginMode ? "Don't have an account?" : 'Already have an account?' }}
+          <a class="text-decoration-none" href="#" (click)="toggleMode(); $event.preventDefault()">
+            {{ isLoginMode ? 'Register here' : 'Login here' }}
+          </a>
+        </p>
+
+      </form>
+    </div>
+  </div>
+</div>

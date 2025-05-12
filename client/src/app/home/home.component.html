@@ -1,1 +1,38 @@
-<p>home works!</p>
+<!-- home.component.html -->
+<div class="container">
+  <div class="row align-items-center py-5">
+    <div class="col-md-6 text-center text-md-start">
+      <h1 class="display-4 fw-bold mb-4">
+        Meal Planning <br class="d-none d-md-block"> Made Easy
+      </h1>
+      <p class="lead text-muted mb-4">
+        Simplify your cooking with personalized meal plans, smart recipes, and easy grocery lists.
+      </p>
+      <div class="d-flex justify-content-center justify-content-md-start gap-3 mb-3">
+        <a class="btn btn-primary btn-lg" routerLink="/auth" routerLinkActive="true" >Get Started</a>
+        <a class="btn btn-outline-secondary btn-lg " routerLink="/learn-more" routerLinkActive="true">Learn More</a>
+      </div>
+      <p class="text-muted small">
+        Join over 4,500,000 others for free today
+      </p>
+    </div>
+
+    <div class="col-md-6 d-none d-md-block">
+      <div class="bg-light rounded-3 p-4">
+        <div class="row g-3">
+          @for (feature of features; track feature.title) {
+            <div class="col-md-4">
+              <div class="card h-100 text-center border-0 bg-white shadow-sm">
+                <div class="card-body">
+                  <fa-icon [icon]="feature.icon" class="fa-2x text-primary mb-3"></fa-icon>
+                  <h5 class="card-title">{{ feature.title }}</h5>
+                  <p class="card-text text-muted small">{{ feature.description }}</p>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -18,7 +18,6 @@ public class GmailService : IEmailService
 {
 
     private readonly GoogleSettings _googleSettings;
-
     public GmailService(IOptions<GoogleSettings> googleSettings)
     {
         _googleSettings = googleSettings.Value;

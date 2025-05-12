@@ -1,4 +1,5 @@
 using API.Data;
+using API.Helpers;
 using API.Interfaces;
 using API.Repositories;
 using API.Services;
@@ -13,6 +14,8 @@ public static class ApplicationServiceExtensions
     services.AddControllers().AddJsonOptions(options => {
         //options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
     });
+    services.Configure<GoogleSettings>(config.GetSection(GoogleSettings.GoogleSettingsKey));
+    services.Configure<CloudinarySettings>(config.GetSection(CloudinarySettings.CloudinarySettingsKey));
     services.AddDbContext<DataContext>(opt => 
     {
         opt.UseSqlite(config.GetConnectionString("DefaultConnection"));

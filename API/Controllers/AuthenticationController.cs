@@ -52,6 +52,13 @@ public class AuthenticationController : BaseAPIController
         return loginResponse;
     }
 
+    [HttpPost("google-auth")]
+    public async Task<ActionResult<UserDTO>> GoogleAuth([FromBody] GoogleDTO googleDTO)
+    {
+        var googleAuthResponse = await _unitOfServices.AuthService.GoogleAuth(googleDTO);
+        return googleAuthResponse;
+    }
+
     [HttpPost("forgot-password")]
     public async Task<ActionResult> ForgotPassword(ForgotPasswordDTO forgotPasswordDTO)
     {

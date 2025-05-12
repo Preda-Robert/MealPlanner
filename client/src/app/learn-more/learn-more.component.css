@@ -1,0 +1,21 @@
+/* learn-more.component.css */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.pricing .card {
+  border: none;
+}
+
+.pricing .card-body {
+  padding: 2rem;
+}
+
+.pricing ul li {
+  margin-bottom: 0.5rem;
+}
