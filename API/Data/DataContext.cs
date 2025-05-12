@@ -20,17 +20,57 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<Applicati
     // override conventions for entity framework
     protected override void OnModelCreating(ModelBuilder builder)
     {
-         base.OnModelCreating(builder);
+
+        builder.Entity<Allergy>()
+            .HasMany(a => a.DietaryPreferences)
+            .WithMany(dp => dp.Allergies)
+            .UsingEntity(j => j.ToTable("DietaryPreferencesAllergies"));
+
+        builder.Entity<Cookware>()
+            .HasMany(c => c.Recipes)
+            .WithOne(rc => rc.Cookware)
+            .HasForeignKey(rc => rc.CookwareId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
+
+        base.OnModelCreating(builder);
         builder.Entity<ApplicationUser>()
             .HasMany(ur => ur.UserRoles)
             .WithOne(u => u.User)
             .HasForeignKey(ur => ur.UserId)
             .IsRequired();
+
         builder.Entity<ApplicationRole>()
             .HasMany(ur => ur.UserRoles)
             .WithOne(u => u.Role)
             .HasForeignKey(ur => ur.RoleId)
             .IsRequired();
+
+
+        builder.Entity<ApplicationUser>()
+            .HasMany(u => u.ShoppingLists)
+            .WithOne(sl => sl.User)
+            .HasForeignKey(sl => sl.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<ApplicationUser>()
+            .HasMany(u => u.MealPlans)
+            .WithOne(mp => mp.User)
+            .HasForeignKey(mp => mp.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<ApplicationUser>()
+            .HasMany(u => u.Recipes)
+            .WithOne(r => r.User)
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Recipe>()
+            .HasMany(r => r.Cookware)
+            .WithOne(rc => rc.Recipe)
+            .HasForeignKey(rc => rc.RecipeId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Recipe>()
         .HasMany(r => r.Ingredients)
@@ -65,7 +105,13 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<Applicati
             .WithOne(rc => rc.Recipe)
             .HasForeignKey(rc => rc.RecipeId)
             .OnDelete(DeleteBehavior.Cascade);
-            
-            
+
+        builder.Entity<Recipe>()
+            .HasOne(r => r.User)
+            .WithMany(u => u.Recipes)
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
     }
 }

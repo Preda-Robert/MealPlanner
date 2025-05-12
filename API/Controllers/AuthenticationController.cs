@@ -1,45 +1,66 @@
-using System;
-using API.DTO;
-using API.DTOs;
-using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-
+using API.DTOs;
+using API.DTO;
+using API.Services;
+using API.Interfaces;
+using Microsoft.AspNetCore.Authentication.Google;
 namespace API.Controllers;
-
 public class AuthenticationController : BaseAPIController
 {
-    private readonly IUnitOfServices _unitOfServices;
 
+    private readonly IUnitOfServices _unitOfServices;
     public AuthenticationController(IUnitOfServices unitOfServices)
     {
         _unitOfServices = unitOfServices;
     }
 
-    [HttpPost("login")]
-    public async Task<ActionResult<UserDTO>> Login(LoginDTO loginDTO)
-    {
-        var userServiceResult = await _unitOfServices.UserService.LoginUser(loginDTO);
-        return userServiceResult;
-    }
-    
     [HttpPost("register")]
     public async Task<ActionResult<RegisterResponseDTO>> Register(RegisterDTO registerDTO)
     {
-        var userServiceResult = await _unitOfServices.UserService.RegisterUser(registerDTO);
-        return userServiceResult;
+        var registerRespone = await _unitOfServices.AuthService.RegisterUser(registerDTO);
+        return registerRespone;
+
     }
 
-    [HttpPost("google")]
-    public async Task<ActionResult<UserDTO>> GoogleAuth(GoogleDTO googleDTO)
+    [HttpGet("confirm-email")]
+    public async Task<ActionResult<bool>> ConfirmEmail(EmailConfirmationDTO emailConfirmationDTO)
     {
-        var userServiceResult = await _unitOfServices.UserService.GoogleAuth(googleDTO);
-        return userServiceResult;
+
+        var confirmEmailResponse = await _unitOfServices.AuthService.ConfirmEmailAsync(emailConfirmationDTO);
+        return confirmEmailResponse;
+
     }
 
-    [HttpPost("confirm-email")]
-    public async Task<ActionResult> ConfirmEmail(EmailConfirmationDTO emailConfirmationDTO)
+    [HttpPost("verify-email")]
+    public async Task<ActionResult<bool>> VerifyEmail(EmailVerificationDTO verificationDTO)
     {
-        var userServiceResult = await _unitOfServices.UserService.ConfirmEmailAsync(emailConfirmationDTO);
-        return userServiceResult;
+        var result = await _unitOfServices.AuthService.VerifyEmailAsync(verificationDTO);
+        return result;
+    }
+
+    [HttpPost("resend-verification-code")]
+    public async Task<ActionResult> ResendVerificationCode([FromBody] ResendVerificationCodeDTO request)
+    {
+        var result = await _unitOfServices.AuthService.ResendVerificationCodeAsync(request);
+        return result;
+    }
+
+    [HttpPost("login")]
+    public async Task<ActionResult<UserDTO>> Login(LoginDTO loginDTO)
+    {
+        var loginResponse = await _unitOfServices.AuthService.LoginUser(loginDTO);
+        return loginResponse;
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult> ForgotPassword(ForgotPasswordDTO forgotPasswordDTO)
+    {
+        return await _unitOfServices.AuthService.ForgotPasswordAsync(forgotPasswordDTO);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<ActionResult> ResetPassword(ResetPasswordDTO resetPasswordDTO)
+    {
+        return await _unitOfServices.AuthService.ResetPasswordAsync(resetPasswordDTO);
     }
 }

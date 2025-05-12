@@ -6,18 +6,18 @@ namespace API.Helpers;
 
 public class Seed
 {
-    public static Task SeedRoles(RoleManager<IdentityRole> roleManager)
+    public static Task SeedRoles(RoleManager<ApplicationRole> roleManager)
     {
-        var roles = new List<IdentityRole>
+        var roles = new List<ApplicationRole>
         {
-            new IdentityRole { Name = "Admin" },
-            new IdentityRole { Name = "Moderator" },
-            new IdentityRole { Name = "Member" }
+            new ApplicationRole { Name = "Admin" },
+            new ApplicationRole { Name = "Moderator" },
+            new ApplicationRole { Name = "Member" }
         };
 
         foreach (var role in roles)
         {
-            if (!roleManager.RoleExistsAsync(role.Name).Result)
+            if (!roleManager.RoleExistsAsync(role.Name!).Result)
             {
                 roleManager.CreateAsync(role).Wait();
             }

@@ -11,6 +11,8 @@ namespace API.Entities;
         public int CookingTime { get; set; }
         public Photo? Photo { get; set; }
         public float Rating { get; set; }
+        public int? UserId { get; set; }
+        public ApplicationUser? User { get; set; }
         public RecipeDifficulty Difficulty { get; set; }
         public ServingType ServingType { get; set; } = null!;
         public DateTime DateAdded { get; set; } = DateTime.UtcNow;

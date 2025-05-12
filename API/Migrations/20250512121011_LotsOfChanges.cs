@@ -6,11 +6,24 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class LotsOfChanges : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Allergy",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Allergy", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -27,17 +40,29 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DietaryPreferences",
+                name: "DietType",
                 columns: table => new
                 {
-                    DietaryPreferenceId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false)
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DietaryPreferences", x => x.DietaryPreferenceId);
+                    table.PrimaryKey("PK_DietType", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IngredientCategories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IngredientCategories", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -52,6 +77,20 @@ namespace API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Photos", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ServingType",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    NumberOfServings = table.Column<int>(type: "INTEGER", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServingType", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -81,7 +120,12 @@ namespace API.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    DisplayName = table.Column<string>(type: "TEXT", nullable: false),
                     PhotoId = table.Column<int>(type: "INTEGER", nullable: true),
+                    EmailVerificationCode = table.Column<string>(type: "TEXT", nullable: true),
+                    EmailVerificationCodeExpiry = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    PasswordResetCode = table.Column<string>(type: "TEXT", nullable: true),
+                    PasswordResetCodeExpiry = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -111,16 +155,15 @@ namespace API.Migrations
                 name: "Cookwares",
                 columns: table => new
                 {
-                    CookwareId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Type = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
                     PhotoId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cookwares", x => x.CookwareId);
+                    table.PrimaryKey("PK_Cookwares", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Cookwares_Photos_PhotoId",
                         column: x => x.PhotoId,
@@ -132,18 +175,24 @@ namespace API.Migrations
                 name: "Ingredients",
                 columns: table => new
                 {
-                    IngredientId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Category = table.Column<string>(type: "TEXT", nullable: false),
+                    CategoryId = table.Column<int>(type: "INTEGER", nullable: false),
                     IsAllergen = table.Column<bool>(type: "INTEGER", nullable: false),
-                    NutritionalInfo = table.Column<string>(type: "TEXT", nullable: false),
+                    MeasurementType = table.Column<int>(type: "INTEGER", nullable: false),
                     Calories = table.Column<float>(type: "REAL", nullable: false),
                     PhotoId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Ingredients", x => x.IngredientId);
+                    table.PrimaryKey("PK_Ingredients", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Ingredients_IngredientCategories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "IngredientCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Ingredients_Photos_PhotoId",
                         column: x => x.PhotoId,
@@ -237,19 +286,49 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DietaryPreferences",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
+                    DietTypeId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ServingTypeId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DietaryPreferences", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DietaryPreferences_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DietaryPreferences_DietType_DietTypeId",
+                        column: x => x.DietTypeId,
+                        principalTable: "DietType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DietaryPreferences_ServingType_ServingTypeId",
+                        column: x => x.ServingTypeId,
+                        principalTable: "ServingType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MealPlans",
                 columns: table => new
                 {
-                    MealPlanId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UserId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MealPlans", x => x.MealPlanId);
+                    table.PrimaryKey("PK_MealPlans", x => x.Id);
                     table.ForeignKey(
                         name: "FK_MealPlans_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -262,27 +341,36 @@ namespace API.Migrations
                 name: "Recipes",
                 columns: table => new
                 {
-                    RecipeId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
-                    PreparationTime = table.Column<int>(type: "INTEGER", nullable: false),
                     CookingTime = table.Column<int>(type: "INTEGER", nullable: false),
-                    Difficulty = table.Column<string>(type: "TEXT", nullable: false),
-                    Image = table.Column<string>(type: "TEXT", nullable: false),
-                    Instructions = table.Column<string>(type: "TEXT", nullable: false),
-                    Servings = table.Column<int>(type: "INTEGER", nullable: false),
-                    DateAdded = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    PhotoId = table.Column<int>(type: "INTEGER", nullable: true),
                     Rating = table.Column<float>(type: "REAL", nullable: false),
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false)
+                    UserId = table.Column<int>(type: "INTEGER", nullable: true),
+                    Difficulty = table.Column<int>(type: "INTEGER", nullable: false),
+                    ServingTypeId = table.Column<int>(type: "INTEGER", nullable: false),
+                    DateAdded = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Recipes", x => x.RecipeId);
+                    table.PrimaryKey("PK_Recipes", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Recipes_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Recipes_Photos_PhotoId",
+                        column: x => x.PhotoId,
+                        principalTable: "Photos",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Recipes_ServingType_ServingTypeId",
+                        column: x => x.ServingTypeId,
+                        principalTable: "ServingType",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -291,14 +379,14 @@ namespace API.Migrations
                 name: "ShoppingList",
                 columns: table => new
                 {
-                    ShoppingListId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UserId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ShoppingList", x => x.ShoppingListId);
+                    table.PrimaryKey("PK_ShoppingList", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ShoppingList_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -308,28 +396,26 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserDietaryPreference",
+                name: "DietaryPreferencesAllergies",
                 columns: table => new
                 {
-                    UserDietaryPreferenceId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    DietaryPreferenceId = table.Column<int>(type: "INTEGER", nullable: false)
+                    AllergiesId = table.Column<int>(type: "INTEGER", nullable: false),
+                    DietaryPreferencesId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserDietaryPreference", x => x.UserDietaryPreferenceId);
+                    table.PrimaryKey("PK_DietaryPreferencesAllergies", x => new { x.AllergiesId, x.DietaryPreferencesId });
                     table.ForeignKey(
-                        name: "FK_UserDietaryPreference_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
+                        name: "FK_DietaryPreferencesAllergies_Allergy_AllergiesId",
+                        column: x => x.AllergiesId,
+                        principalTable: "Allergy",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserDietaryPreference_DietaryPreferences_DietaryPreferenceId",
-                        column: x => x.DietaryPreferenceId,
+                        name: "FK_DietaryPreferencesAllergies_DietaryPreferences_DietaryPreferencesId",
+                        column: x => x.DietaryPreferencesId,
                         principalTable: "DietaryPreferences",
-                        principalColumn: "DietaryPreferenceId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -337,27 +423,32 @@ namespace API.Migrations
                 name: "MealPlanRecipe",
                 columns: table => new
                 {
-                    MealPlanRecipeId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    MealType = table.Column<string>(type: "TEXT", nullable: false),
-                    PlannedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    RecipeId = table.Column<int>(type: "INTEGER", nullable: false),
                     MealPlanId = table.Column<int>(type: "INTEGER", nullable: false),
-                    RecipeId = table.Column<int>(type: "INTEGER", nullable: false)
+                    ServingTypeId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MealPlanRecipe", x => x.MealPlanRecipeId);
+                    table.PrimaryKey("PK_MealPlanRecipe", x => x.Id);
                     table.ForeignKey(
                         name: "FK_MealPlanRecipe_MealPlans_MealPlanId",
                         column: x => x.MealPlanId,
                         principalTable: "MealPlans",
-                        principalColumn: "MealPlanId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_MealPlanRecipe_Recipes_RecipeId",
                         column: x => x.RecipeId,
                         principalTable: "Recipes",
-                        principalColumn: "RecipeId",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MealPlanRecipe_ServingType_ServingTypeId",
+                        column: x => x.ServingTypeId,
+                        principalTable: "ServingType",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -365,25 +456,25 @@ namespace API.Migrations
                 name: "RecipeCookware",
                 columns: table => new
                 {
-                    RecipeCookwareId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     RecipeId = table.Column<int>(type: "INTEGER", nullable: false),
                     CookwareId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RecipeCookware", x => x.RecipeCookwareId);
+                    table.PrimaryKey("PK_RecipeCookware", x => x.Id);
                     table.ForeignKey(
                         name: "FK_RecipeCookware_Cookwares_CookwareId",
                         column: x => x.CookwareId,
                         principalTable: "Cookwares",
-                        principalColumn: "CookwareId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_RecipeCookware_Recipes_RecipeId",
                         column: x => x.RecipeId,
                         principalTable: "Recipes",
-                        principalColumn: "RecipeId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -391,27 +482,47 @@ namespace API.Migrations
                 name: "RecipeIngredient",
                 columns: table => new
                 {
-                    RecipeIngredientId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: false),
-                    Unit = table.Column<string>(type: "TEXT", nullable: false),
                     RecipeId = table.Column<int>(type: "INTEGER", nullable: false),
                     IngredientId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RecipeIngredient", x => x.RecipeIngredientId);
+                    table.PrimaryKey("PK_RecipeIngredient", x => x.Id);
                     table.ForeignKey(
                         name: "FK_RecipeIngredient_Ingredients_IngredientId",
                         column: x => x.IngredientId,
                         principalTable: "Ingredients",
-                        principalColumn: "IngredientId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_RecipeIngredient_Recipes_RecipeId",
                         column: x => x.RecipeId,
                         principalTable: "Recipes",
-                        principalColumn: "RecipeId",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RecipeInstruction",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    InstructionIndex = table.Column<int>(type: "INTEGER", nullable: false),
+                    RecipeId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RecipeInstruction", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RecipeInstruction_Recipes_RecipeId",
+                        column: x => x.RecipeId,
+                        principalTable: "Recipes",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -419,7 +530,7 @@ namespace API.Migrations
                 name: "ShoppingListItem",
                 columns: table => new
                 {
-                    ShoppingListItemId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: false),
                     Unit = table.Column<string>(type: "TEXT", nullable: false),
@@ -429,18 +540,18 @@ namespace API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ShoppingListItem", x => x.ShoppingListItemId);
+                    table.PrimaryKey("PK_ShoppingListItem", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ShoppingListItem_Ingredients_IngredientId",
                         column: x => x.IngredientId,
                         principalTable: "Ingredients",
-                        principalColumn: "IngredientId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ShoppingListItem_ShoppingList_ShoppingListId",
                         column: x => x.ShoppingListId,
                         principalTable: "ShoppingList",
-                        principalColumn: "ShoppingListId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -492,6 +603,32 @@ namespace API.Migrations
                 column: "PhotoId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DietaryPreferences_DietTypeId",
+                table: "DietaryPreferences",
+                column: "DietTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DietaryPreferences_ServingTypeId",
+                table: "DietaryPreferences",
+                column: "ServingTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DietaryPreferences_UserId",
+                table: "DietaryPreferences",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DietaryPreferencesAllergies_DietaryPreferencesId",
+                table: "DietaryPreferencesAllergies",
+                column: "DietaryPreferencesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ingredients_CategoryId",
+                table: "Ingredients",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Ingredients_PhotoId",
                 table: "Ingredients",
                 column: "PhotoId");
@@ -505,6 +642,11 @@ namespace API.Migrations
                 name: "IX_MealPlanRecipe_RecipeId",
                 table: "MealPlanRecipe",
                 column: "RecipeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MealPlanRecipe_ServingTypeId",
+                table: "MealPlanRecipe",
+                column: "ServingTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MealPlans_UserId",
@@ -532,6 +674,21 @@ namespace API.Migrations
                 column: "RecipeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RecipeInstruction_RecipeId",
+                table: "RecipeInstruction",
+                column: "RecipeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Recipes_PhotoId",
+                table: "Recipes",
+                column: "PhotoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Recipes_ServingTypeId",
+                table: "Recipes",
+                column: "ServingTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Recipes_UserId",
                 table: "Recipes",
                 column: "UserId");
@@ -550,16 +707,6 @@ namespace API.Migrations
                 name: "IX_ShoppingListItem_ShoppingListId",
                 table: "ShoppingListItem",
                 column: "ShoppingListId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserDietaryPreference_DietaryPreferenceId",
-                table: "UserDietaryPreference",
-                column: "DietaryPreferenceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserDietaryPreference_UserId",
-                table: "UserDietaryPreference",
-                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -581,6 +728,9 @@ namespace API.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "DietaryPreferencesAllergies");
+
+            migrationBuilder.DropTable(
                 name: "MealPlanRecipe");
 
             migrationBuilder.DropTable(
@@ -590,13 +740,19 @@ namespace API.Migrations
                 name: "RecipeIngredient");
 
             migrationBuilder.DropTable(
+                name: "RecipeInstruction");
+
+            migrationBuilder.DropTable(
                 name: "ShoppingListItem");
 
             migrationBuilder.DropTable(
-                name: "UserDietaryPreference");
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "Allergy");
+
+            migrationBuilder.DropTable(
+                name: "DietaryPreferences");
 
             migrationBuilder.DropTable(
                 name: "MealPlans");
@@ -614,7 +770,13 @@ namespace API.Migrations
                 name: "ShoppingList");
 
             migrationBuilder.DropTable(
-                name: "DietaryPreferences");
+                name: "DietType");
+
+            migrationBuilder.DropTable(
+                name: "ServingType");
+
+            migrationBuilder.DropTable(
+                name: "IngredientCategories");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

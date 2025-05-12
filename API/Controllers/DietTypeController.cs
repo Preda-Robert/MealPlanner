@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[Route("api/diet-type")]
+[ApiController]
 public class DietTypeController : BaseAPIController
 {
     private readonly IUnitOfServices _unitOfServices;

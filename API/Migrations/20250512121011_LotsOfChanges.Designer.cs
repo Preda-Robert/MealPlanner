@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250511142222_ChangesToIngredient")]
-    partial class ChangesToIngredient
+    [Migration("20250512121011_LotsOfChanges")]
+    partial class LotsOfChanges
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,16 +26,11 @@ namespace API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("DietaryPreferencesId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DietaryPreferencesId");
 
                     b.ToTable("Allergy");
                 });
@@ -80,8 +75,9 @@ namespace API.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("DietaryPreferencesId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -89,6 +85,12 @@ namespace API.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("EmailVerificationCode")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("EmailVerificationCodeExpiry")
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");
@@ -105,6 +107,12 @@ namespace API.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PasswordHash")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordResetCode")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("PasswordResetCodeExpiry")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PhoneNumber")
@@ -127,8 +135,6 @@ namespace API.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DietaryPreferencesId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -174,10 +180,6 @@ namespace API.Migrations
                     b.Property<int?>("PhotoId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PhotoId");
@@ -212,11 +214,17 @@ namespace API.Migrations
                     b.Property<int>("ServingTypeId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DietTypeId");
 
                     b.HasIndex("ServingTypeId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("DietaryPreferences");
                 });
@@ -276,12 +284,12 @@ namespace API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("ApplicationUserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("MealPlans");
                 });
@@ -292,7 +300,7 @@ namespace API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("MealPlanId")
+                    b.Property<int>("MealPlanId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("RecipeId")
@@ -362,13 +370,39 @@ namespace API.Migrations
                     b.Property<int>("ServingTypeId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PhotoId");
 
                     b.HasIndex("ServingTypeId");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Recipes");
+                });
+
+            modelBuilder.Entity("API.Entities.RecipeCookware", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CookwareId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CookwareId");
+
+                    b.HasIndex("RecipeId");
+
+                    b.ToTable("RecipeCookware");
                 });
 
             modelBuilder.Entity("API.Entities.RecipeIngredient", b =>
@@ -385,10 +419,6 @@ namespace API.Migrations
 
                     b.Property<int>("RecipeId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -490,6 +520,21 @@ namespace API.Migrations
                     b.ToTable("ShoppingListItem");
                 });
 
+            modelBuilder.Entity("AllergyDietaryPreferences", b =>
+                {
+                    b.Property<int>("AllergiesId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DietaryPreferencesId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("AllergiesId", "DietaryPreferencesId");
+
+                    b.HasIndex("DietaryPreferencesId");
+
+                    b.ToTable("DietaryPreferencesAllergies", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.Property<int>("Id")
@@ -574,26 +619,11 @@ namespace API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("API.Entities.Allergy", b =>
-                {
-                    b.HasOne("API.Entities.DietaryPreferences", null)
-                        .WithMany("Allergies")
-                        .HasForeignKey("DietaryPreferencesId");
-                });
-
             modelBuilder.Entity("API.Entities.ApplicationUser", b =>
                 {
-                    b.HasOne("API.Entities.DietaryPreferences", "DietaryPreferences")
-                        .WithMany()
-                        .HasForeignKey("DietaryPreferencesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("API.Entities.Photo", "Photo")
                         .WithMany()
                         .HasForeignKey("PhotoId");
-
-                    b.Navigation("DietaryPreferences");
 
                     b.Navigation("Photo");
                 });
@@ -629,7 +659,7 @@ namespace API.Migrations
             modelBuilder.Entity("API.Entities.DietaryPreferences", b =>
                 {
                     b.HasOne("API.Entities.DietType", "DietType")
-                        .WithMany()
+                        .WithMany("DietaryPreferences")
                         .HasForeignKey("DietTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -640,9 +670,17 @@ namespace API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("API.Entities.ApplicationUser", "User")
+                        .WithOne("DietaryPreferences")
+                        .HasForeignKey("API.Entities.DietaryPreferences", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("DietType");
 
                     b.Navigation("ServingType");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("API.Entities.Ingredient", b =>
@@ -664,16 +702,22 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Entities.MealPlan", b =>
                 {
-                    b.HasOne("API.Entities.ApplicationUser", null)
+                    b.HasOne("API.Entities.ApplicationUser", "User")
                         .WithMany("MealPlans")
-                        .HasForeignKey("ApplicationUserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("API.Entities.MealPlanRecipe", b =>
                 {
-                    b.HasOne("API.Entities.MealPlan", null)
+                    b.HasOne("API.Entities.MealPlan", "MealPlan")
                         .WithMany("MealPlanRecipes")
-                        .HasForeignKey("MealPlanId");
+                        .HasForeignKey("MealPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("API.Entities.Recipe", "Recipe")
                         .WithMany()
@@ -686,6 +730,8 @@ namespace API.Migrations
                         .HasForeignKey("ServingTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("MealPlan");
 
                     b.Navigation("Recipe");
 
@@ -704,9 +750,35 @@ namespace API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("API.Entities.ApplicationUser", "User")
+                        .WithMany("Recipes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.Navigation("Photo");
 
                     b.Navigation("ServingType");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("API.Entities.RecipeCookware", b =>
+                {
+                    b.HasOne("API.Entities.Cookware", "Cookware")
+                        .WithMany("Recipes")
+                        .HasForeignKey("CookwareId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Entities.Recipe", "Recipe")
+                        .WithMany("Cookware")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cookware");
+
+                    b.Navigation("Recipe");
                 });
 
             modelBuilder.Entity("API.Entities.RecipeIngredient", b =>
@@ -769,6 +841,21 @@ namespace API.Migrations
                     b.Navigation("ShoppingList");
                 });
 
+            modelBuilder.Entity("AllergyDietaryPreferences", b =>
+                {
+                    b.HasOne("API.Entities.Allergy", null)
+                        .WithMany()
+                        .HasForeignKey("AllergiesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Entities.DietaryPreferences", null)
+                        .WithMany()
+                        .HasForeignKey("DietaryPreferencesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("API.Entities.ApplicationRole", null)
@@ -812,16 +899,26 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Entities.ApplicationUser", b =>
                 {
+                    b.Navigation("DietaryPreferences")
+                        .IsRequired();
+
                     b.Navigation("MealPlans");
+
+                    b.Navigation("Recipes");
 
                     b.Navigation("ShoppingLists");
 
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("API.Entities.DietaryPreferences", b =>
+            modelBuilder.Entity("API.Entities.Cookware", b =>
                 {
-                    b.Navigation("Allergies");
+                    b.Navigation("Recipes");
+                });
+
+            modelBuilder.Entity("API.Entities.DietType", b =>
+                {
+                    b.Navigation("DietaryPreferences");
                 });
 
             modelBuilder.Entity("API.Entities.Ingredient", b =>
@@ -841,6 +938,8 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Entities.Recipe", b =>
                 {
+                    b.Navigation("Cookware");
+
                     b.Navigation("Ingredients");
 
                     b.Navigation("Instructions");

@@ -8,4 +8,6 @@ public class MealPlan
 {
     public int Id { get; set; }        
     public ICollection<MealPlanRecipe> MealPlanRecipes { get; set; } = [];
+    public int UserId { get; set; }
+    public ApplicationUser User { get; set; } = null!;
 }

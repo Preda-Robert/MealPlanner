@@ -1,4 +1,5 @@
 using System;
+using API.Services;
 
 namespace API.Interfaces;
 
@@ -12,6 +13,7 @@ public interface IUnitOfServices : IDisposable
     ICookwareService CookwareService { get; }
     ITokenService TokenService { get; }
     IUserService UserService { get; }
+    IAuthService AuthService { get; }
     IBaseService<TEntity, TDTO> Service<TEntity, TDTO>()
         where TEntity : class
         where TDTO : class;

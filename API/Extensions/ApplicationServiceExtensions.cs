@@ -30,12 +30,14 @@ public static class ApplicationServiceExtensions
     services.AddScoped<ITokenService, TokenService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IEmailService, GmailService>();
+    services.AddScoped<IAuthService, AuthService>();
     // Repositories
     services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
     services.AddScoped<IAllergyRepository, AllergyRepository>();
     services.AddScoped<IIngredientRepository, IngredientRepository>();
     services.AddScoped<IIngredientCategoryRepository, IngredientCategoryRepository>();
     services.AddScoped<IRecipeRepository, RecipeRepository>();
+    services.AddScoped<IUserRepository, UserRepository>();
     services.AddScoped<IServingTypeRepository, ServingTypeRepository>();
     services.AddScoped<ICookwareRepository, CookwareRepository>();
     services.AddScoped<IUnitOfWork, UnitOfWork>();

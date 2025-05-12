@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[Route("api/serving-type")]
+[ApiController]
 public class ServingTypeController : BaseAPIController
 {
     private readonly IUnitOfServices _unitOfServices;

@@ -1,5 +1,6 @@
 using System;
 using API.Entities;
+using API.Helpers;
 using API.Interfaces;
 using API.Repositories;
 
@@ -14,5 +15,10 @@ public class RecipeRepository : BaseRepository<Recipe>, IRecipeRepository
     public async Task<Recipe?> GetRecipeByIdAsync(int id)
     {
         return await _context.Recipes.FindAsync(id);
+    }
+
+    public Task<ICollection<Recipe>?> GetRecipesAsync(RecipeParams recipeParams)
+    {
+        return null!;
     }
 }

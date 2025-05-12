@@ -28,7 +28,7 @@ try
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<DataContext>();
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
     await context.Database.MigrateAsync();
     await Seed.SeedRoles(roleManager);
 }

@@ -35,5 +35,8 @@ public class AutoMapperProfiles: Profile
         CreateMap<RecipeInstructionDTO, RecipeInstruction>();
 
         CreateMap<RegisterDTO, ApplicationUser>();
+
+        CreateMap<DietType, DietTypeDTO>();
+        CreateMap<DietTypeDTO, DietType>();
     }
 }
