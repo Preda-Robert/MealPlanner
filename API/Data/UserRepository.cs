@@ -31,6 +31,11 @@ public class UserRepository : BaseRepository<ApplicationUser>, IUserRepository
         return await _userManager.DeleteAsync(user);
     }
 
+    public async Task<IdentityResult> AddToRoleAsync(ApplicationUser user, string role)
+    {
+        return await _userManager.AddToRoleAsync(user, role);
+    }
+
     public async Task<string> GenerateEmailConfirmationTokenAsync(ApplicationUser user)
     {
         return await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -87,9 +92,15 @@ public class UserRepository : BaseRepository<ApplicationUser>, IUserRepository
 
     public async Task<string> GenerateEmailVerificationCodeAsync(ApplicationUser user)
     {
-
+        
         var random = new Random();
         var code = random.Next(100000, 999999).ToString();
+        bool codeExists = true;
+        while(codeExists)
+        {
+            code = random.Next(100000, 999999).ToString();
+            codeExists = await _userManager.Users.AnyAsync(x => x.EmailVerificationCode == code);
+        }
 
         user.EmailVerificationCode = code;
         user.EmailVerificationCodeExpiry = DateTime.UtcNow.AddMinutes(15);

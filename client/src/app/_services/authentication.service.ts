@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
+import { effect, Injectable, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { inject, signal, computed } from '@angular/core';
 import { User } from '../_models/user';
 import { catchError, map } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.development';
 import { FavoritesService } from './favorites.service';
 import { throwError } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
@@ -11,6 +11,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { EmailVerification } from '../_models/emailVerification';
 import { ResetPasswordRequest } from '../_models/password-reset';
 import { GoogleApiService } from './google-api.service';
+import { RegisterResponse } from '../_models/registerResponse';
 
 
 @Injectable({
@@ -22,33 +23,67 @@ export class AuthenticationService {
   private favoritesService = inject(FavoritesService);
   private toastr = inject(ToastrService);
   private googleapiService = inject(GoogleApiService);
+  private googleAuthenticated : boolean = false;
 
   baseUrl = environment.apiUrl;
   currentUser = signal<User | null>(null);
   roles = computed(() => {
     const user = this.currentUser();
-    if(user && user.token)
-    {
-      const role =  JSON.parse(atob(user.token.split('.')[1])).role;
+    if (user && user.token) {
+      const role = JSON.parse(atob(user.token.split('.')[1])).role;
       return Array.isArray(role) ? role : [role];
     }
     return [null];
   });
 
-  login(model: any)
-  {
+  constructor() {
+    effect(() => {
+      const idToken = this.googleapiService.idToken();
+      if(!this.googleAuthenticated && idToken) {
+        this.googleLogin(idToken).subscribe({
+          next: user => {
+            if (user) {
+              this.googleAuthenticated = true;
+            }
+          },
+          error: error => {
+            //.error('Google login error:', error);
+          }
+        });
+      }
+      else if (idToken === null) {
+        this.googleAuthenticated = false;
+      }
+    });
+  }
+
+
+  login(model: any) {
     return this.http.post<User>(this.baseUrl + 'authentication/login', model).pipe(
       map(user => {
-          if(user)
+        if (user) {
+          if(user.emailConfirmed !== false)
           {
             this.setCurrentUser(user);
           }
+          return user;
         }
+        return undefined;
+      },
+      catchError(error => {
+        if (error.status === 400) {
+          this.toastr.error(error.error);
+        } else {
+          this.toastr.error('Login failed');
+        }
+        return throwError(() => 'Login failed. Please try again.');
+      })
       )
     );
   }
 
-    verifyEmailCode(verificationData: EmailVerification) {
+  verifyEmailCode(verificationData: EmailVerification) {
+    console.log(verificationData);
     return this.http.post(this.baseUrl + 'authentication/verify-email', verificationData).pipe(
       map(() => {
         return true;
@@ -79,9 +114,15 @@ export class AuthenticationService {
   }
 
   googleLogin(idToken: string) {
-    console.log('Sending Google login request to:', this.baseUrl + 'authentication/google-auth');
-    return this.http.post<User>(this.baseUrl + 'authentication/google-auth', { idToken }).pipe(
+    //console.log('googleLogin method called with idToken:', idToken);
+    //console.log('Sending Google login request to:', this.baseUrl + 'authentication/google-auth');
+    const token = { IdToken: idToken };
+    //.log('Request payload:', token);
+    //console.log('API baseUrl:', this.baseUrl);
+
+    return this.http.post<User>(this.baseUrl + 'authentication/google-auth', token).pipe(
       map(user => {
+        //console.log('HTTP response received:', user);
         if (user) {
           this.setCurrentUser(user);
           this.toastr.success('Logged in with Google successfully');
@@ -90,32 +131,30 @@ export class AuthenticationService {
         return null;
       }),
       catchError(error => {
-        this.toastr.error('Google login failed');
+        console.error('HTTP request error:', {
+          status: error.status,
+          statusText: error.statusText,
+          message: error.message,
+          error: error.error
+        });
+        this.toastr.error('Google login failed: ' + (error.message || 'Unknown error'));
         return throwError(() => 'Google login failed. Please try again.');
       })
     );
   }
 
-  register(model: any) {
+  register(model: RegisterResponse) {
     console.log('Sending registration request to:', this.baseUrl + 'authentication/register');
     console.log('Registration data:', model);
 
-    return this.http.post<any>(this.baseUrl + 'authentication/register', model).pipe(
+    return this.http.post<RegisterResponse>(this.baseUrl + 'authentication/register', model).pipe(
       map(response => {
-        console.log('Raw registration response:', response);
-
-        if (response.isRegistered) {
-          this.toastr.success('Registration successful');
-        }
-
-        if (response.requiresEmailConfirmation) {
-          console.log('Email confirmation required, userId:', response.userId);
-        }
+        //console.log('Raw registration response:', response);
 
         return response;
       }),
       catchError(error => {
-        console.error('Registration error in service:', error);
+        //console.error('Registration error in service:', error);
 
         if (error.status === 400) {
           if (typeof error.error === 'string') {
@@ -133,14 +172,13 @@ export class AuthenticationService {
     );
   }
 
-  setCurrentUser(user: User)
-  {
+  setCurrentUser(user: User) {
     localStorage.setItem('user', JSON.stringify(user));
     this.currentUser.set(user);
     this.favoritesService.getLikeIds();
   }
 
-   refreshUserData() {
+  refreshUserData() {
     return this.http.get<User>(this.baseUrl + 'user').pipe(
       map(user => {
         if (user) {
@@ -184,8 +222,7 @@ export class AuthenticationService {
     );
   }
 
-  logout()
-  {
+  logout() {
     this.googleapiService.logOut();
     localStorage.removeItem('user');
     this.currentUser.set(null);

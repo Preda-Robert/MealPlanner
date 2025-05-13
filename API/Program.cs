@@ -1,3 +1,4 @@
+using System.Text;
 using API.Data;
 using API.Entities;
 using API.Extensions;
@@ -18,6 +19,37 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.Use(async (context, next) =>
+{
+    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+    logger.LogInformation("Request path: {Path}, Method: {Method}", 
+        context.Request.Path, context.Request.Method);
+    
+    if (context.Request.Path.ToString().Contains("google-auth"))
+    {
+        logger.LogInformation("Google auth request detected");
+        
+        // Enable buffering to allow reading request body multiple times
+        context.Request.EnableBuffering();
+        
+        // Read the request body
+        using (var reader = new StreamReader(
+            context.Request.Body,
+            encoding: Encoding.UTF8,
+            detectEncodingFromByteOrderMarks: false,
+            leaveOpen: true))
+        {
+            var body = await reader.ReadToEndAsync();
+            logger.LogInformation("Google auth request body: {Body}", body);
+            
+            // Reset the request body position
+            context.Request.Body.Position = 0;
+        }
+    }
+    
+    await next();
+});
 
 app.UseHttpsRedirection();
 

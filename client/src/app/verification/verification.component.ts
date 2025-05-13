@@ -58,7 +58,7 @@ export class VerificationComponent implements OnInit {
         id: this.userId,
         code: this.verificationForm.get('code')?.value
       };
-
+      console.log('Verification data:', verificationData);
       this.authenticationService.verifyEmailCode(verificationData).subscribe({
         next: () => {
           this.loading = false;

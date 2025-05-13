@@ -1,10 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthenticationService } from '../_services/authentication.service';
 import { Router, RouterLink } from '@angular/router';
 import { TextInputComponent } from "../_forms/text-input/text-input.component";
 import { CommonModule } from '@angular/common';
 import { GoogleApiService } from '../_services/google-api.service';
+import { User } from '../_models/user';
 
 @Component({
   selector: 'app-auth',
@@ -58,18 +59,8 @@ export class AuthComponent implements OnInit {
   }
 
   loginWithGoogle() {
-    this.googleService.configure().subscribe(idToken => {
-      if (idToken) {
-        this.authenticationService.googleLogin(idToken).subscribe({
-          next: () => {
-            this.router.navigateByUrl('/');
-          },
-          error: error => {
-            this.validationErrors = error.error ? [error.error] : ['Google login failed'];
-          }
-        });
-      }
-    });
+    console.log('loginWithGoogle');
+    this.googleService.loginWithGoogle();
   }
 
   onSubmit() {
@@ -79,12 +70,35 @@ export class AuthComponent implements OnInit {
         password: this.authForm.value.password
       };
       this.authenticationService.login(credentials).subscribe({
-        next: () => this.router.navigate(['/members']),
+        next: (user) => {
+          console.log('User:', user);
+          if (user && user.emailConfirmed === false) {
+            console.log('User is not verified');
+            sessionStorage.setItem('pendingLoginCredentials', JSON.stringify(credentials));
+            sessionStorage.setItem('verificationUserId', user.id.toString());
+            this.router.navigate(['/verify-email']);
+          } else if (user && user.emailConfirmed === true) {
+            this.router.navigate(['/profile']);
+          }
+          if(typeof user === 'undefined')
+          {
+            this.validationErrors = ['Invalid username or password'];
+          }
+
+        },
         error: err => this.validationErrors = err
       });
     } else {
       this.authenticationService.register(this.authForm.value).subscribe({
-        next: () => this.router.navigate(['/members']),
+        next: (registerResponse) => {
+          if(registerResponse && registerResponse.requireEmailVerification !== false)
+          {
+            sessionStorage.setItem('pendingLoginCredentials', JSON.stringify(this.authForm.value));
+            sessionStorage.setItem('verificationUserId', registerResponse.userId.toString());
+          }
+          this.validationErrors = undefined;
+          this.router.navigate(['/verify-email']);
+        },
         error: err => this.validationErrors = err
       });
     }

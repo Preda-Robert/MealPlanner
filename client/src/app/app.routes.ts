@@ -9,6 +9,7 @@ import { memberDetailedResolver } from './_resolvers/member-detailed.resolver';
 import { adminGuard } from './_guards/admin.guard';
 import { LearnMoreComponent } from './learn-more/learn-more.component';
 import { AuthComponent } from './auth/auth.component';
+import { VerificationComponent } from './verification/verification.component';
 
 export const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -17,7 +18,8 @@ export const routes: Routes = [
     runGuardsAndResolvers: 'always',
     children: [
       {path: 'learn-more', component: LearnMoreComponent},
-      {path: 'auth', component: AuthComponent}
+      {path: 'auth', component: AuthComponent},
+      {path: 'verify-email', component: VerificationComponent},
     ]
   },
   {path: 'errors', component: TestErrorsComponent},

@@ -10,6 +10,7 @@ public interface IUserRepository : IBaseRepository<ApplicationUser>
     Task<IdentityResult> CreateAsync(ApplicationUser user, string password);
     Task<IdentityResult> UpdateAsync(ApplicationUser user); 
     Task<IdentityResult> DeleteAsync(ApplicationUser user);
+    Task<IdentityResult> AddToRoleAsync(ApplicationUser user, string role);
     Task<ApplicationUser?> GetUserByIdAsync(int id);
     Task<string> GenerateEmailConfirmationTokenAsync(ApplicationUser user);
     Task<bool> IsEmailConfirmedAsync(ApplicationUser user);

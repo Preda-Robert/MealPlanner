@@ -5,6 +5,8 @@ using API.Services;
 using API.Interfaces;
 using Microsoft.AspNetCore.Authentication.Google;
 namespace API.Controllers;
+[Route("api/authentication")]
+[ApiController]
 public class AuthenticationController : BaseAPIController
 {
 

@@ -7,6 +7,7 @@ using API.Interfaces;
 using AutoMapper;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Mvc;
+using PasswordGenerator;
 
 namespace API.Services;
 
@@ -56,6 +57,7 @@ public class AuthService : BaseService<ApplicationUser, UserDTO>, IAuthService
 
         var user = _mapper.Map<ApplicationUser>(registerDTO);
         var createResult = await _unitOfWork.UserRepository.CreateAsync(user, registerDTO.Password!);
+        await _unitOfWork.UserRepository.AddToRoleAsync(user, "Member");
         if (createResult.Succeeded == false)
         {
             return new BadRequestObjectResult("Problem creating user account");
@@ -114,7 +116,7 @@ public class AuthService : BaseService<ApplicationUser, UserDTO>, IAuthService
         var emailConfirmed = await _unitOfWork.UserRepository.IsEmailConfirmedAsync(user);
         if (emailConfirmed == false)
         {
-            // Use the 6-digit code method instead of token
+            
             var verificationCode = await _unitOfWork.UserRepository.GenerateEmailVerificationCodeAsync(user);
 
             SendEmailRequest sendEmailRequest = new SendEmailRequest(user.Email!,
@@ -127,27 +129,14 @@ public class AuthService : BaseService<ApplicationUser, UserDTO>, IAuthService
             {
                 return new BadRequestObjectResult("Problem sending verification code");
             }
-
-            // Return unauthorized with user ID for verification
-            return new UnauthorizedObjectResult(new
-            {
-                message = "Email not confirmed. Check your email for verification code.",
-                userId = user.Id
-            });
         }
 
         var token = await _tokenService.CreateToken(user);
 
         await _unitOfWork.UserRepository.UpdateAsync(user);
 
-        return new UserDTO
-        {
-            UserName = user.UserName!,
-            DisplayName = user.DisplayName,
-            Token = token,
-            PhotoUrl = user.Photo?.Url,
-            EmailConfirmed = user.EmailConfirmed,
-        };
+        var userDTO = _mapper.Map<UserDTO>(user);
+        return userDTO;
     }
     public async Task<ActionResult<UserDTO>> GoogleAuth(GoogleDTO goolgeDTO)
     {
@@ -169,21 +158,29 @@ public class AuthService : BaseService<ApplicationUser, UserDTO>, IAuthService
             return new UnauthorizedObjectResult("Invalid credentials");
         }
         var user = await GetUserByUsernameOrEmailAsync(null!, payload.Email!);
+        var name = payload.Name;
+        name = name.Replace(" ", "");
         if (user == null)
         {
             user = new ApplicationUser
             {
-                UserName = payload.Name,
-                DisplayName = payload.Name,
-                Email = payload.Email,
-                EmailConfirmed = true,
+                UserName = name,
+                DisplayName = name,
+                Email = payload.Email
             };
-            var result = await _unitOfWork.UserRepository.CreateAsync(user, null!);
+            var pwd = new Password(includeLowercase: true, includeUppercase: false, includeNumeric: false, includeSpecial: false, passwordLength: 8);
+            var password = pwd.Next();
+            var result = await _unitOfWork.UserRepository.CreateAsync(user, password);
             if (result.Succeeded == false)
             {
                 return new BadRequestObjectResult("Problem creating user account " + result.Errors.Select(x => x.Description).ToList());
             }
+            await _unitOfWork.UserRepository.AddToRoleAsync(user, "Member");
         }
+
+        user.EmailConfirmed = true;
+        _unitOfWork.UserRepository.Update(user);
+        await _unitOfWork.SaveAsync();
 
         var token = await _tokenService.CreateToken(user);
 
