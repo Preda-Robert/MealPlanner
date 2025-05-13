@@ -12,6 +12,7 @@ namespace API.Interfaces
         IServingTypeRepository ServingTypeRepository { get; }
         ICookwareRepository CookwareRepository { get; }
         IUserRepository UserRepository { get; }
+        IPhotoRepository PhotoRepository { get; }
 
         IBaseRepository<TEntity> Repository<TEntity>() where TEntity : class;
         Task<bool> SaveAsync();

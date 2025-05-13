@@ -27,4 +27,6 @@ public interface IUserRepository : IBaseRepository<ApplicationUser>
     Task<bool> VerifyPasswordResetCodeAsync(ApplicationUser user, string code);
     Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string token, string newPassword);
     Task<bool> ConfirmEmailAsync(ApplicationUser user, string token);
+    Task<ApplicationUser?> GetUserByIdAsync(int id, bool isCurrentUser = false);
+    Task<ApplicationUser?> GetUserByUsernameAsync(string username, bool isCurrentUser = false);
 }

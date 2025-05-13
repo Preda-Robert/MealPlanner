@@ -21,6 +21,14 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<Applicati
     protected override void OnModelCreating(ModelBuilder builder)
     {
 
+         builder.Entity<ApplicationUserRecipe>()
+            .HasKey(k => new {k.SourceUserId, k.TargetRecipeId});
+        builder.Entity<ApplicationUserRecipe>()
+        .HasOne(s => s.SourceUser)
+        .WithMany(f => f.FavoriteRecipes)
+        .HasForeignKey(s => s.SourceUserId)
+        .OnDelete(DeleteBehavior.Cascade);
+
         builder.Entity<Allergy>()
             .HasMany(a => a.DietaryPreferences)
             .WithMany(dp => dp.Allergies)

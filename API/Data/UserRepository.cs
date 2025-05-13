@@ -179,4 +179,38 @@ public class UserRepository : BaseRepository<ApplicationUser>, IUserRepository
         }
         return false;
     }
+
+    public async Task<ApplicationUser?> GetUserByIdAsync(int id, bool isCurrentUser = false)
+    {
+        var query = _context.Users
+            .Include(x => x.Photo)
+            .Include(x => x.DietaryPreferences)
+            .Include(x => x.ShoppingLists)
+            .Include(x => x.MealPlans)
+            .Include(x => x.Recipes)
+            .Include(x => x.FavoriteRecipes)
+            .AsQueryable();
+        if (isCurrentUser)
+        {
+                // query filters??
+        }
+        return await query.FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task<ApplicationUser?> GetUserByUsernameAsync(string username, bool isCurrentUser = false)
+    {
+        var query = _context.Users
+            .Include(x => x.Photo)
+            .Include(x => x.DietaryPreferences)
+            .Include(x => x.ShoppingLists)
+            .Include(x => x.MealPlans)
+            .Include(x => x.Recipes)
+            .Include(x => x.FavoriteRecipes)
+            .AsQueryable();
+        if (isCurrentUser)
+        {
+                // query filters??
+        }
+        return await query.FirstOrDefaultAsync(x => x.UserName == username);
+    }
 }

@@ -29,6 +29,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     private readonly DataContext _context;
     private Dictionary<Type, object> _repositories;
     private readonly IServiceProvider _serviceProvider;
+    public IPhotoRepository PhotoRepository { get; }
     private bool _disposed;
 
     public UnitOfWork(DataContext context, IServiceProvider serviceProvider,
@@ -38,7 +39,8 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         IRecipeRepository recipeRepository,
         IServingTypeRepository servingTypeRepository,
         ICookwareRepository cookwareRepository,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        IPhotoRepository photoRepository)
     {
         _context = context;
         _serviceProvider = serviceProvider;
@@ -49,6 +51,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         ServingTypeRepository = servingTypeRepository;
         CookwareRepository = cookwareRepository;
         UserRepository = userRepository;
+        PhotoRepository = photoRepository;
         _repositories = new Dictionary<Type, object>();
     }
     public IBaseRepository<TEntity> Repository<TEntity>() where TEntity : class
