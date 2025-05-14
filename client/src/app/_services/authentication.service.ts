@@ -7,7 +7,6 @@ import { environment } from '../../environments/environment.development';
 import { FavoritesService } from './favorites.service';
 import { throwError } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import { CookieService } from 'ngx-cookie-service';
 import { EmailVerification } from '../_models/emailVerification';
 import { ResetPasswordRequest } from '../_models/password-reset';
 import { GoogleApiService } from './google-api.service';

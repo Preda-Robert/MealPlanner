@@ -1,4 +1,3 @@
-using System;
 using API.DTO;
 using API.Entities;
 using API.Helpers;
@@ -12,40 +11,42 @@ namespace API.Services;
 
 public class PhotoService : BaseService<Photo, PhotoDTO>, IPhotoService
 {
-    private readonly Cloudinary _cloudinary;
-    public PhotoService(IOptions<CloudinarySettings> config, IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+  private readonly Cloudinary _cloudinary;
+  public PhotoService(IOptions<CloudinarySettings> config, IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
+  {
+    var acc = new Account
     {
-        var acc = new Account
-        {
-            Cloud = config.Value.CloudName,
-            ApiKey = config.Value.ApiKey,
-            ApiSecret = config.Value.ApiSecret
-        };
+      Cloud = config.Value.CloudName,
+      ApiKey = config.Value.ApiKey,
+      ApiSecret = config.Value.ApiSecret
+    };
 
-        _cloudinary = new Cloudinary(acc);
-        
-    }
-    public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
-    {
-        var uploadResult = new ImageUploadResult();
-        if(file.Length > 0)
-        {
-            using var stream = file.OpenReadStream();
-            var uploadParams = new ImageUploadParams
-            {
-                File = new FileDescription(file.FileName, stream),
-                Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face"),
-                Folder = "mealplanner"
-            };
-            uploadResult = await _cloudinary.UploadAsync(uploadParams);
-        }
-        return uploadResult;
-    }
+    _cloudinary = new Cloudinary(acc);
 
-    public async Task<DeletionResult> DeletePhotoAsync(string publicId)
+  }
+  public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
+  {
+    var uploadResult = new ImageUploadResult();
+    if (file.Length > 0)
     {
-        var deleteParams = new DeletionParams(publicId);
-        var result = await _cloudinary.DestroyAsync(deleteParams);
-        return result;
+      using var stream = file.OpenReadStream();
+      var uploadParams = new ImageUploadParams
+      {
+        File = new FileDescription(file.FileName, stream),
+        Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face"),
+        Folder = "mealplanner"
+      };
+      uploadResult = await _cloudinary.UploadAsync(uploadParams);
     }
+    return uploadResult;
+  }
+
+  public async Task<DeletionResult> DeletePhotoAsync(string publicId)
+  {
+    var deleteParams = new DeletionParams(publicId);
+    var result = await _cloudinary.DestroyAsync(deleteParams);
+    return result;
+  }
+
+
 }

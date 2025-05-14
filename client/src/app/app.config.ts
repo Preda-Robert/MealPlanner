@@ -11,6 +11,7 @@ import {NgxSpinner} from 'ngx-spinner';
 import { loadingInterceptor } from './_interceptors/loading.interceptor';
 import { TimeagoModule } from 'ngx-timeago';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { IngredientsComponent } from './ingredients/ingredients.component'; 
 
 
 export const appConfig: ApplicationConfig = {

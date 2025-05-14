@@ -1,0 +1,40 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-6 col-lg-4 mb-4" *ngFor="let ingredient of ingredients">
+      <div class="card h-100">
+        <!-- Card Header with Name -->
+        <h3 class="card-header">{{ ingredient.name }}</h3>
+
+        <!-- Image with fallback -->
+        <img [src]="getSafeImageUrl(ingredient.photoUrl)"
+             class="card-img-top"
+             [alt]="ingredient.name + ' image'"
+             style="height: 200px; object-fit: cover;"
+             onerror="this.src='assets/placeholder.svg'">
+
+        <!-- Card Body -->
+        <div class="card-body">
+          <h5 class="card-title">Category: {{ ingredient.category?.name || 'Not specified' }}</h5>
+          
+          <h6 class="card-subtitle text-muted mb-2">
+            Measurement: {{ ingredient.measurementType || 'Not specified' }}
+          </h6>
+          
+          <p class="card-text">
+            Calories: {{ ingredient.calories | number:'1.0-0' }} kcal
+          </p>
+
+          <!-- Allergen Warning -->
+          <p *ngIf="ingredient.isAllergen" class="text-danger mb-0">
+            ⚠️ Allergen: {{ ingredient.allergy?.name || 'Present (unspecified)' }}
+          </p>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer text-muted">
+          ID: {{ ingredient.id }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
