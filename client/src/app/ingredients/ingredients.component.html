@@ -1,0 +1,10 @@
+<div class="container mt-4">
+  <div class="row">
+    <!-- Simplified card - remove all styling -->
+    <div *ngFor="let ingredient of ingredients">
+      <h3>{{ ingredient.name }}</h3>
+      <p>Category: {{ ingredient.category?.name }}</p>
+      <hr>
+    </div>
+  </div>
+</div>
