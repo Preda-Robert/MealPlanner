@@ -7,7 +7,7 @@ namespace API.Entities;
     {
         public int Id { get; set; }
         public int Quantity { get; set; }
-        public required string Unit { get; set; }
+        public IngredientMeasurementType MeasurementType { get; set; } = IngredientMeasurementType.None;
         public bool IsPurchased { get; set; }
 
         public int ShoppingListId { get; set; }

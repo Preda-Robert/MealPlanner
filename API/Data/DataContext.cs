@@ -15,6 +15,14 @@ public class DataContext(DbContextOptions options) : IdentityDbContext<Applicati
     public DbSet<IngredientCategory> IngredientCategories { get; set; }
     public DbSet<DietaryPreferences> DietaryPreferences { get; set; }
     public DbSet<MealPlan> MealPlans { get; set; }
+    public DbSet<MealPlanRecipe> MealPlanRecipes { get; set; }
+    public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
+    public DbSet<ShoppingList> ShoppingLists { get; set; }
+    public DbSet<ShoppingListItem> ShoppingListItems { get; set; }
+    public DbSet<RecipeInstruction> RecipeInstructions { get; set; }
+    public DbSet<RecipeCookware> RecipeCookware { get; set; }
+    public DbSet<ServingType> ServingTypes { get; set; }
+    public DbSet<Allergy> Allergies { get; set; }
     public DbSet<Photo> Photos { get; set; }
 
     // override conventions for entity framework

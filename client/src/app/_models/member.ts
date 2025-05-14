@@ -1,20 +1,16 @@
+import { DietaryPreference } from "./dietaryPreference"
+import { MealPlan } from "./mealPlan"
 import { Photo } from "./photo"
+import { Recipe } from "./recipe"
 
 export interface Member {
   id: number
   username: string
-  age: number
-  photoUrl: string
-  knownAs: string
-  created: Date
-  lastActive: Date
-  gender: string
-  introduction: string
-  interests: string
-  lookingFor: string
-  city: string
-  country: string
-  photos: Photo[]
+  displayname: string
+  photo: Photo
+  dietaryPreference : DietaryPreference
+  createdRecipes : Recipe[]
+  mealPlans : MealPlan[]
 }
 
 

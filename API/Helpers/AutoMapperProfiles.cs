@@ -16,6 +16,13 @@ public class AutoMapperProfiles: Profile
         CreateMap<Photo, PhotoDTO>();
         CreateMap<PhotoDTO, Photo>();
 
+        CreateMap<ShoppingListItem, ShoppingListItemDTO>();
+        CreateMap<ShoppingListItemDTO, ShoppingListItem>();
+
+        CreateMap<Cookware, CookwareDTO>()
+            .ForMember(d => d.PhotoUrl, o => o.MapFrom(p => p.Photo!.Url));
+        CreateMap<CookwareDTO, Cookware>();
+
         CreateMap<ApplicationUser, UserDTO>()
             .ForMember(d => d.PhotoUrl, o => o.MapFrom(p => p.Photo!.Url));
 
@@ -25,7 +32,8 @@ public class AutoMapperProfiles: Profile
         CreateMap<ServingType, ServingTypeDTO>();
         CreateMap<ServingTypeDTO, ServingType>();
 
-        CreateMap<Ingredient, IngredientDTO>();
+        CreateMap<Ingredient, IngredientDTO>()
+            .ForMember(d => d.PhotoUrl, o => o.MapFrom(p => p.Photo!.Url));
         CreateMap<IngredientDTO, Ingredient>();
 
         CreateMap<Recipe, RecipeDTO>();
@@ -37,12 +45,16 @@ public class AutoMapperProfiles: Profile
         CreateMap<RecipeInstruction, RecipeInstructionDTO>();
         CreateMap<RecipeInstructionDTO, RecipeInstruction>();
 
+        CreateMap<Ingredient, RecipeIngredientDTO>();
+        CreateMap<RecipeIngredientDTO, Ingredient>();
+
         CreateMap<RegisterDTO, ApplicationUser>();
 
         CreateMap<DietType, DietTypeDTO>();
         CreateMap<DietTypeDTO, DietType>();
 
-        CreateMap<MealPlan, MealPlanDTO>();
+        CreateMap<MealPlan, MealPlanDTO>()
+            .ForMember(d => d.PhotoUrl, o => o.MapFrom(p => p.Photo!.Url));
         CreateMap<MealPlanDTO, MealPlan>();
         CreateMap<MealPlanRecipe, MealPlanRecipeDTO>();
             
@@ -53,5 +65,7 @@ public class AutoMapperProfiles: Profile
         CreateMap<ApplicationUser, MemberDTO>();
 
         CreateMap<MemberUpdateDTO, ApplicationUser>();
+
+        CreateMap<RecipeUpdateDTO, Recipe>();
     }
 }

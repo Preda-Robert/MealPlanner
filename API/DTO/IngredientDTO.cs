@@ -12,10 +12,11 @@ public class IngredientDTO
     public string Name { get; set; } = string.Empty;
     public IngredientCategoryDTO Category { get; set; } = null!;
     public bool IsAllergen { get; set; }
+    public AllergyDTO? Allergy { get; set; } = null!;
     [JsonPropertyName("MeasurementType")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public IngredientMeasurementType MeasurementType { get; set; }
     public float Calories { get; set; }
-    public PhotoDTO? Photo { get; set; } = null!;
+    public string? PhotoUrl { get; set; }
 
 }

@@ -1,55 +1,105 @@
 <div class="row">
-    <div class="col-4">
-      <div class="card">
-        <img class="card-img img-thumbnail" src="{{member.photoUrl || './assets/user.png'}}" alt="{{member.knownAs}}">
-        <div class="card-body">
-          <div>
-            <strong>Location:</strong>
-            <p>{{member.city}}, {{member.country}}</p>
-          </div>
-          <div>
-            <strong>Age:</strong>
-            <p>{{member.age}}</p>
-          </div>
-          <div>
-            <strong>Last active:</strong>
-            <p>{{member.lastActive | timeago}}</p>
-          </div>
-          <div>
-            <strong>Member since:</strong>
-            <p>{{member.created | date: 'longDate'}}</p>
-          </div>
-          <div class="card-footer">
-            <div class="btn-group d-flex">
-              <button (click)="toggleLike()" class="btn btn-primary">{{hasLiked() ? 'Liked' : 'Like'}}</button>
-              <button (click)="selectTab('Messages')" class="btn btn-success">Messages</button>
-            </div>
+  <div class="col-4">
+    <div class="card">
+      <img class="card-img img-thumbnail" [src]="member.photoUrl || './assets/user.png'" [alt]="member.displayName">
+      <div class="card-body">
+        <div>
+          <strong>Username:</strong>
+          <p>{{member.userName}}</p>
+        </div>
+        <div>
+          <strong>Display Name:</strong>
+          <p>{{member.displayName}}</p>
+        </div>
+        <div>
+          <strong>Dietary Preference:</strong>
+          <p>{{member.dietaryPreference?.name}}</p>
+        </div>
+        <div>
+          <strong>Created Recipes:</strong>
+          <p>{{member.createdRecipes?.length || 0}}</p>
+        </div>
+        <div>
+          <strong>Favorite Recipes:</strong>
+          <p>{{member.favoriteRecipes?.length || 0}}</p>
+        </div>
+        <div>
+          <strong>Meal Plans:</strong>
+          <p>{{member.mealPlans?.length || 0}}</p>
+        </div>
+        <div class="card-footer">
+          <div class="btn-group d-flex">
+            <button (click)="toggleLike()" class="btn btn-primary">{{hasLiked() ? 'Favorited' : 'Add to Favorites'}}</button>
+            <button (click)="selectTab('Messages')" class="btn btn-success">Messages</button>
           </div>
         </div>
       </div>
     </div>
-    <div class="col-8">
-      <tabset #memberTabs class="member-tabset">
-        <tab heading="About {{member.knownAs}}" (selectTab)="onTabActivated($event)">
-          <h4>Description</h4>
-          <p>{{member.introduction}}</p>
-          <h4>Looking for</h4>
-          <p>{{member.lookingFor}}</p>
-        </tab>
-        <tab heading="Interests" (selectTab)="onTabActivated($event)">
-          <h4>Interests</h4>
-          <p>{{member.interests}}</p>
-        </tab>
-        <tab heading="Photos" #photoTab="tab" (selectTab)="onTabActivated($event)"> <!-- tab must be active before showing the gallery -->
-          @if(photoTab.active)
-          {
-            <gallery [items]="images" [itemAutosize]="true" class="gallery">
-            </gallery>
-          }
-        </tab>
-        <tab heading="Messages" (selectTab)="onTabActivated($event)">
-          <app-member-messages [username]="member.username"></app-member-messages>
-        </tab>
-      </tabset>
-    </div>
+  </div>
+  <div class="col-8">
+    <tabset #memberTabs class="member-tabset">
+      <tab heading="About {{member.displayName}}" (selectTab)="onTabActivated($event)">
+        <h4>Created Recipes</h4>
+        @if(member.createdRecipes?.length) {
+          <div class="row">
+            @for(recipe of member.createdRecipes; track recipe.id) {
+              <div class="col-md-6 mb-3">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">{{recipe.name}}</h5>
+                    <p class="card-text">{{recipe.description | slice:0:100}}...</p>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <p>No recipes created yet.</p>
+        }
+      </tab>
+      <tab heading="Favorite Recipes" (selectTab)="onTabActivated($event)">
+        <h4>Favorite Recipes</h4>
+        @if(member.favoriteRecipes?.length) {
+          <div class="row">
+            @for(recipe of member.favoriteRecipes; track recipe.id) {
+              <div class="col-md-6 mb-3">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">{{recipe.name}}</h5>
+                    <p class="card-text">{{recipe.description | slice:0:100}}...</p>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <p>No favorite recipes yet.</p>
+        }
+      </tab>
+      <tab heading="Meal Plans" (selectTab)="onTabActivated($event)">
+        <h4>Meal Plans</h4>
+        @if(member.mealPlans?.length) {
+          <div class="row">
+            @for(mealPlan of member.mealPlans; track mealPlan.id) {
+              <div class="col-md-6 mb-3">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">{{mealPlan.name}}</h5>
+                    <p class="card-text">{{mealPlan.description}}</p>
+                    <p><strong>Start Date:</strong> {{mealPlan.startDate | date}}</p>
+                    <p><strong>End Date:</strong> {{mealPlan.endDate | date}}</p>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <p>No meal plans created yet.</p>
+        }
+      </tab>
+      <tab heading="Messages" (selectTab)="onTabActivated($event)">
+        <app-member-messages [username]="member.userName"></app-member-messages>
+      </tab>
+    </tabset>
+  </div>
 </div>

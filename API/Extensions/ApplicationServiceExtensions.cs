@@ -31,6 +31,7 @@ public static class ApplicationServiceExtensions
     services.AddScoped<IServingTypeService, ServingTypeService>();
     services.AddScoped<ICookwareService, CookwareService>();
     services.AddScoped<ITokenService, TokenService>();
+    services.AddScoped<IMealPlanService, MealPlanService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IEmailService, GmailService>();
     services.AddScoped<IAuthService, AuthService>();
@@ -43,6 +44,7 @@ public static class ApplicationServiceExtensions
     services.AddScoped<IRecipeRepository, RecipeRepository>();
     services.AddScoped<IUserRepository, UserRepository>();
     services.AddScoped<IServingTypeRepository, ServingTypeRepository>();
+    services.AddScoped<IMealPlanRepository, MealPlanRepository>();
     services.AddScoped<ICookwareRepository, CookwareRepository>();
     services.AddScoped<IPhotoRepository, PhotoRepository>();
     services.AddScoped<IUnitOfWork, UnitOfWork>();

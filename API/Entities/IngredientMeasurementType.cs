@@ -16,5 +16,8 @@ public enum IngredientMeasurementType
     Piece,
     Slice,
     Pinch,
-    Dash
+    Dash,
+    Clove,
+    Drop,
+    None
 }

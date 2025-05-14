@@ -7,11 +7,14 @@ public class Ingredient
 {
     public int Id { get; set; }
     public required string Name { get; set; }
+    public int CategoryId { get; set; }
     public IngredientCategory Category { get; set; } = null!;
-    public bool IsAllergen { get; set; }
-    public IngredientMeasurementType MeasurementType { get; set; }
+    public bool IsAllergen { get; set; } = false;
+    public int? AllergyId { get; set; }
+    public Allergy? Allergy { get; set; }
+    public IngredientMeasurementType MeasurementType { get; set; } = IngredientMeasurementType.None;
     public float Calories { get; set; }
-    public Photo? Photo { get; set; } = null!;
+    public Photo? Photo { get; set; }
 
     public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = null!;
 }

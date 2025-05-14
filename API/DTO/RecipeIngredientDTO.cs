@@ -5,6 +5,6 @@ namespace API.DTO;
 
 public class RecipeIngredientDTO
 {
-        public int Quantity { get; set; }
+        public float Quantity { get; set; }
         public IngredientDTO Ingredient { get; set; } = null!;
 }

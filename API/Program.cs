@@ -3,6 +3,7 @@ using API.Data;
 using API.Entities;
 using API.Extensions;
 using API.Helpers;
+using API.Interfaces;
 using API.Middleware;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -63,8 +64,14 @@ try
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<DataContext>();
     var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+    var unitOfServices = services.GetRequiredService<IUnitOfServices>();
     await context.Database.MigrateAsync();
     await Seed.SeedRoles(roleManager);
+    await Seed.SeedAllergies(unitOfServices);
+    await Seed.SeedIngredientCategories(unitOfServices);
+    await Seed.SeedIngredients(unitOfServices);
+    await Seed.SeedCookware(unitOfServices);
+    await Seed.SeedRecipes(unitOfServices);
 }
 catch (Exception ex)
 {

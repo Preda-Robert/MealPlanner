@@ -13,7 +13,7 @@ public class RecipeDTO
     [Required]
     public required string Description { get; set; } = string.Empty;
     public int CookingTime { get; set; } = 0;
-    public Photo? Photo { get; set; }
+    public string? PhotoUrl { get; set; } = null;
     [Range(0, 5, ErrorMessage = "Rating must be between 0 and 5")]
     public float Rating { get; set; } = 0;
     [JsonPropertyName("Difficulty")]
@@ -21,6 +21,8 @@ public class RecipeDTO
     public RecipeDifficulty Difficulty { get; set; } = RecipeDifficulty.Easy;
     public ServingTypeDTO ServingType { get; set; } = null!;
     public DateTime DateAdded { get; set; } = DateTime.UtcNow;
+    public ICollection<AllergyDTO> Allergies { get; set; } = [];
+    public ICollection<CookwareDTO> Cookware { get; set; } = [];
     public ICollection<RecipeInstructionDTO> Instructions { get; set; } = [];
     public ICollection<RecipeIngredientDTO> Ingredients { get; set; } = [];
 
