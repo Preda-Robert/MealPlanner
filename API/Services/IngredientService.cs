@@ -12,7 +12,6 @@ public class IngredientService : BaseService<Ingredient, IngredientDTO>, IIngred
   {
   }
 
-  //override the GetAllAsync method to include Allergy and Category
   public override async Task<ActionResult<ICollection<IngredientDTO>>> GetAllAsync()
   {
     var ingredients = await _unitOfWork.Repository<Ingredient>().GetAllAsync();
@@ -42,7 +41,7 @@ public class IngredientService : BaseService<Ingredient, IngredientDTO>, IIngred
             : null,
       MeasurementType = i.MeasurementType,
       Calories = i.Calories,
-      PhotoUrl = null // Just pass through whatever is in the entity
+      PhotoUrl = null
     }).ToList();
 
     return new OkObjectResult(result);
