@@ -12,7 +12,7 @@ public class MealPlanRepository : BaseRepository<MealPlan>, IMealPlanRepository
     {
     }
 
-    public Task<PagedList<MealPlan>> GetMealPlansAsync(MealPlanParams mealPlanParams)
+    public IQueryable<MealPlan> GetMealPlans(MealPlanParams mealPlanParams)
     {
         var query = _context.MealPlans.AsQueryable();
 
@@ -21,6 +21,8 @@ public class MealPlanRepository : BaseRepository<MealPlan>, IMealPlanRepository
             query = query.Where(m => m.Name.ToLower().Contains(mealPlanParams.SearchTerm.ToLower()));
         }
 
-        return PagedList<MealPlan>.CreateAsync(query, mealPlanParams.PageNumber, mealPlanParams.PageSize);
+        query = query.OrderBy(m => m.Name);
+
+        return query;
     }
 }

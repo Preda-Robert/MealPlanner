@@ -1,6 +1,7 @@
 using System;
 using API.DTO;
 using API.Entities;
+using API.Extensions;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,4 +26,5 @@ public class IngredientCategoryController : BaseAPIController
         var ingredientCategoriesServiceResult = await _unitOfServices.IngredientCategoryService.GetAllAsync();
         return ingredientCategoriesServiceResult;
     }
+
 }

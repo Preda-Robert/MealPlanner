@@ -28,6 +28,7 @@ public class UnitOfServices : IUnitOfServices, IDisposable
     public IAuthService AuthService { get; }
     public IPhotoService PhotoService { get; }
     public IMealPlanService MealPlanService { get; }
+    public IDietaryPreferenceService DietaryPreferenceService { get; }
     private Dictionary<Type, object> _services;
     private readonly IServiceProvider _serviceProvider;
     private bool _disposed;
@@ -43,7 +44,8 @@ public class UnitOfServices : IUnitOfServices, IDisposable
         IUserService userService,
         IAuthService authService,
         IPhotoService photoService,
-        IMealPlanService mealPlanService)
+        IMealPlanService mealPlanService,
+        IDietaryPreferenceService dietaryPreferenceService)
     {
         _serviceProvider = serviceProvider;
         AllergyService = allergyService;
@@ -57,6 +59,7 @@ public class UnitOfServices : IUnitOfServices, IDisposable
         AuthService = authService;
         PhotoService = photoService;
         MealPlanService = mealPlanService;
+        DietaryPreferenceService = dietaryPreferenceService;
         _services = new Dictionary<Type, object>();
     }
 

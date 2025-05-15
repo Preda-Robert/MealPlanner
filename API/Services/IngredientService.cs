@@ -1,8 +1,10 @@
 using System;
 using API.DTO;
 using API.Entities;
+using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,7 +34,24 @@ public class IngredientService : BaseService<Ingredient, IngredientDTO>, IIngred
             if (existingIngredient != null)
             {
                 Log($"Ingredient '{dto.Name}' already exists. Skipping.");
-                return _mapper.Map<IngredientDTO>(existingIngredient);
+                // log the allergy
+                Log($"Ingredient '{existingIngredient.Name}' already exists. Allergy: '{existingIngredient.Allergy?.Name}'");
+                var existingIngredientDTO1 = new IngredientDTO
+                {
+                    Id = existingIngredient.Id,
+                    Name = existingIngredient.Name,
+                    Category = new IngredientCategoryDTO
+                    {
+                        Id = existingIngredient.Category.Id,
+                        Name = existingIngredient.Category.Name
+                    },
+                    Allergy = existingIngredient.Allergy != null ? new AllergyDTO
+                    {
+                        Id = existingIngredient.Allergy.Id,
+                        Name = existingIngredient.Allergy.Name
+                    } : null
+                };
+                return new OkObjectResult(existingIngredientDTO1);
             }
 
             var category = await _unitOfWork.IngredientCategoryRepository.GetCategoryByNameAsync(dto.Category.Name);
@@ -58,18 +77,46 @@ public class IngredientService : BaseService<Ingredient, IngredientDTO>, IIngred
             createdIngredient.Allergy = allergy;
 
             category.Ingredients.Add(createdIngredient);
-
+            createdIngredient.CategoryId = category.Id;
+            createdIngredient.AllergyId = allergy?.Id;
+            createdIngredient.IsAllergen = dto.IsAllergen;
+            createdIngredient.MeasurementType = dto.MeasurementType;
+            createdIngredient.Calories = dto.Calories;
+            Log($"Created Ingredient '{createdIngredient.Name}'. Allergy: '{createdIngredient.Allergy?.Name}'");
             await _unitOfWork.IngredientRepository.AddAsync(createdIngredient);
+            _unitOfWork.IngredientCategoryRepository.Update(category);
             await _unitOfWork.SaveAsync();
 
             Log($"Successfully created ingredient: {dto.Name}");
 
-            return _mapper.Map<IngredientDTO>(createdIngredient);
+            var existingIngredientDTO = new IngredientDTO
+            {
+                Id = createdIngredient.Id,
+                Name = createdIngredient.Name,
+                Category = new IngredientCategoryDTO
+                {
+                    Id = createdIngredient.Category.Id,
+                    Name = createdIngredient.Category.Name
+                },
+                Allergy = createdIngredient.Allergy != null ? new AllergyDTO
+                {
+                    Id = createdIngredient.Allergy.Id,
+                    Name = createdIngredient.Allergy.Name
+                } : null
+            };
+
+            return new OkObjectResult(existingIngredientDTO);
         }
         catch (Exception ex)
         {
             Log($"Exception while creating ingredient '{dto.Name}': {ex.Message}");
             throw; // optional: rethrow or handle as needed
         }
+    }
+
+    public async Task<ActionResult<PagedList<IngredientDTO>>> GetAllAsync(IngredientParams ingredientParams)
+    {
+        var allergyQuery = _unitOfWork.IngredientRepository.GetIngredients(ingredientParams);
+        return await PagedList<IngredientDTO>.CreateAsync(allergyQuery.ProjectTo<IngredientDTO>(_mapper.ConfigurationProvider), ingredientParams.PageNumber, ingredientParams.PageSize);
     }
 }

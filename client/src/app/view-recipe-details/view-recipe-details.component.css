@@ -1,0 +1,24 @@
+.recipe-details-card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.card-header {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.list-group-item {
+  border: none;
+  padding: 0.5rem 1rem;
+}
+
+.badge {
+  font-size: 0.9rem;
+  padding: 0.5em 1em;
+}
+
+@media (max-width: 768px) {
+  .card-img-top {
+    max-height: 300px;
+  }
+}

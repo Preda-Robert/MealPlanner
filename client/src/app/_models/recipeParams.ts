@@ -1,6 +1,6 @@
 import { PaginationParams } from "./paginationParams";
 
-export interface RecipeParams extends PaginationParams {
-  searchTerm: string;
-  allergyIds: number[];
+export class RecipeParams extends PaginationParams {
+  searchTerm: string = '';
+  userId: number = 0;
 }

@@ -9,7 +9,7 @@ export interface Ingredient {
   category : IngredientCategory;
   isAllergen : boolean;
   allergy : Allergy
-  measurementType : MeasurementType;
+  MeasurementType : MeasurementType;
   calories : number;
-  photo : Photo;
+  photoUrl : string;
 }

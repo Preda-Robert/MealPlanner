@@ -1,4 +1,4 @@
-export interface PaginationParams {
-  pageNumber: number
-  pageSize: number
+export class PaginationParams {
+  pageNumber: number = 1;
+  pageSize: number = 12;
 }

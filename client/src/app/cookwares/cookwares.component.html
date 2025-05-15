@@ -1,0 +1,46 @@
+<div class="container mt-5">
+  <div class="row mb-4">
+    <div class="col-12 col-md-6 mx-auto">
+      <div class="search-container">
+        <input type="text" class="form-control search-input" placeholder="Search cookware..."
+               [(ngModel)]="searchQuery" (input)="onSearch()">
+        <i class="fa fa-search search-icon"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    @if(cookwareService.paginatedResult()?.items?.length) {
+      @for(cookware of cookwareService.paginatedResult()?.items; track cookware.id) {
+        <div class="col-sm-6 col-md-6 col-lg-4 mb-4">
+          <div class="card cookware-card h-100 shadow-sm">
+            @if(cookware.photoUrl) {
+              <img class="card-img-top" [src]="cookware.photoUrl" [alt]="cookware.name">
+            } @else {
+              <img class="card-img-top" src="https://placehold.co/600x400" [alt]="cookware.name">
+            }
+            <div class="card-body">
+              <h5 class="card-title text-primary">{{cookware.name}}</h5>
+              <p class="card-text text-muted text-truncate">{{cookware.description}}</p>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if(cookwareService.paginatedResult()?.pagination) {
+        <div class="d-flex justify-content-center mt-4">
+          <pagination [boundaryLinks]="true" [totalItems]="cookwareService.paginatedResult()?.pagination!.totalItems"
+            [itemsPerPage]="cookwareService.paginatedResult()?.pagination!.itemsPerPage" [maxSize]="10"
+            [(ngModel)]="cookwareService.paginatedResult()?.pagination!.currentPage"
+            (pageChanged)="onCookwarePageChanged($event)" previousText="‹" nextText="›"
+            firstText="«" lastText="»">
+          </pagination>
+        </div>
+      }
+    } @else {
+      <div class="col-12 text-center mt-5">
+        <p class="text-muted">No cookware found. Try adjusting your search.</p>
+      </div>
+    }
+  </div>
+</div>

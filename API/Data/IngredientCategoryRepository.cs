@@ -48,4 +48,12 @@ public class IngredientCategoryRepository : BaseRepository<IngredientCategory>, 
             .AnyAsync(c => c.Id == id);
     }
 
+    public async Task<int> GetCategoryIdByNameAsync(string name)
+    {
+        var category = await _context.IngredientCategories
+            .FirstOrDefaultAsync(c => c.Name == name);
+
+        return category?.Id ?? 0;
+    }
+
 }

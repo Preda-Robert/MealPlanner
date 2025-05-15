@@ -1,0 +1,63 @@
+<div class="container mt-5">
+  <div class="row mb-4">
+    <div class="col-12 col-md-6 mx-auto">
+      <div class="search-container">
+        <input type="text" class="form-control search-input" placeholder="Search recipes..."
+               [(ngModel)]="searchQuery" (input)="onSearch()">
+        <i class="fa fa-search search-icon"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    @if(recipeService.paginatedResult()?.items?.length) {
+      @for(recipe of recipeService.paginatedResult()?.items; track recipe.id) {
+        <div class="col-sm-6 col-md-6 col-lg-4 mb-4">
+          <div class="card recipe-card h-100 shadow-sm">
+            @if(recipe.photoUrl) {
+              <img class="card-img-top" [src]="recipe.photoUrl" [alt]="recipe.name">
+            } @else {
+              <img class="card-img-top" src="https://placehold.co/600x400" [alt]="recipe.name">
+            }
+            <div class="card-body">
+              <h5 class="card-title text-primary">{{recipe.name}}</h5>
+              <p class="card-text text-muted text-truncate">{{recipe.description}}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="text-primary-emphasis"><i class="fa fa-clock-o me-1"></i>{{recipe.cookingTime}} min</span>
+                <span class="badge rounded-pill" [ngClass]="{
+                  'bg-success': recipe.Difficulty === 'Easy',
+                  'bg-warning text-dark': recipe.Difficulty === 'Medium',
+                  'bg-danger': recipe.Difficulty === 'Hard'
+                }">{{recipe.Difficulty}}</span>
+              </div>
+              <small class="text-muted me-2">Servings: {{recipe.servingType.numberOfServings}}</small>
+              <small class="text-muted me-2">Rating: {{recipe.rating}}</small>
+              <div class="mt-2">
+                <button class="btn btn-primary" (click)="viewRecipeDetails(recipe.id)">View Details</button>
+                <!-- @if(authenticationService.currentUser()) {
+                  <button class="btn btn-secondary ms-2" (click)="addToFavorites(recipe.id)">Add to Favorites</button>
+                } -->
+              </div>
+
+          </div>
+        </div>
+      </div>
+      }
+
+      @if(recipeService.paginatedResult()?.pagination) {
+        <div class="d-flex justify-content-center mt-4">
+          <pagination [boundaryLinks]="true" [totalItems]="recipeService.paginatedResult()?.pagination!.totalItems"
+            [itemsPerPage]="recipeService.paginatedResult()?.pagination!.itemsPerPage" [maxSize]="10"
+            [(ngModel)]="recipeService.paginatedResult()?.pagination!.currentPage"
+            (pageChanged)="onRecipePageChanged($event)" previousText="‹" nextText="›"
+            firstText="«" lastText="»">
+          </pagination>
+        </div>
+      }
+    } @else {
+      <div class="col-12 text-center mt-5">
+        <p class="text-muted">No recipes found. Try adjusting your search.</p>
+      </div>
+    }
+  </div>
+</div>

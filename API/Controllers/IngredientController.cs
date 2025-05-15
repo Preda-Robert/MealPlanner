@@ -1,15 +1,17 @@
 using System;
 using API.DTO;
 using API.Entities;
+using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-public class IngredientController : BaseAPIController
+public class IngredientsController : BaseAPIController
 {
     private readonly IUnitOfServices _unitOfServices;
-    public IngredientController(IUnitOfServices unitOfServices)
+    public IngredientsController(IUnitOfServices unitOfServices)
     {
         _unitOfServices = unitOfServices;
     }
@@ -19,10 +21,14 @@ public class IngredientController : BaseAPIController
         var ingredientServiceResult = await _unitOfServices.IngredientService.Create(ingredient);
         return ingredientServiceResult;
     }
+
     [HttpGet]
-    public async Task<ActionResult<ICollection<IngredientDTO>>> GetIngredients()
+    public async Task<ActionResult<ICollection<IngredientDTO>>> GetIngredients([FromQuery] IngredientParams ingredientParams)
     {
-        var ingredientsServiceResult = await _unitOfServices.IngredientService.GetAllAsync();
-        return ingredientsServiceResult;
+        ingredientParams.CurrentUser = User.GetUserId();
+        var ingredientServiceResult = await _unitOfServices.IngredientService.GetAllAsync(ingredientParams);
+        var ingredients = ingredientServiceResult.Value!;
+        Response.AddPaginationHeader(ingredients.CurrentPage, ingredients);
+        return Ok(ingredients);
     }
 }

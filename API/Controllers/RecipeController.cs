@@ -1,16 +1,18 @@
 using System;
 using API.DTO;
 using API.Entities;
+using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace API.Controllers;
 
-public class RecipeController : BaseAPIController
+public class RecipesController : BaseAPIController
 {
     private readonly IUnitOfServices _unitOfServices;
-    public RecipeController(IUnitOfServices unitOfServices)
+    public RecipesController(IUnitOfServices unitOfServices)
     {
         _unitOfServices = unitOfServices;
     }
@@ -21,9 +23,12 @@ public class RecipeController : BaseAPIController
         return recipeServiceResult;
     }
     [HttpGet]
-    public async Task<ActionResult<ICollection<RecipeDTO>>> GetRecipes()
+    public async Task<ActionResult<ICollection<RecipeDTO>>> GetRecipes([FromQuery] RecipeParams recipeParams)
     {
-        var recipesServiceResult = await _unitOfServices.RecipeService.GetAllAsync();
-        return recipesServiceResult;
+        var recipesServiceResult = await _unitOfServices.RecipeService.GetAllAsync(recipeParams);
+        var recipes = recipesServiceResult.Value!;
+        Response.AddPaginationHeader(recipes.CurrentPage, recipes);
+        return Ok(recipes);
     }
+
 }

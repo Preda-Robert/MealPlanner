@@ -1,16 +1,18 @@
 using System.Threading.Tasks;
 using API.DTO;
 using API.Entities;
+using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    public class AllergyController : BaseAPIController
+    public class AllergiesController : BaseAPIController
     {
         private readonly IUnitOfServices _unitOfServices;
 
-        public AllergyController(IUnitOfServices unitOfServices)
+        public AllergiesController(IUnitOfServices unitOfServices)
         {
             _unitOfServices = unitOfServices;
         }
@@ -23,12 +25,13 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ICollection<AllergyDTO>>> GetAllergies()
+        public async Task<ActionResult<ICollection<AllergyDTO>>> GetAllergies([FromQuery] AllergyParams allergyParams)
         {
-            var allergiesServiceResult = await _unitOfServices.AllergyService.GetAllAsync();
-            return allergiesServiceResult;
+            allergyParams.CurrentUser = User.GetUserId();
+            var allergiesServiceResult = await _unitOfServices.AllergyService.GetAllAsync(allergyParams);
+            var allergies = allergiesServiceResult.Value!;
+            Response.AddPaginationHeader(allergies.CurrentPage, allergies);
+            return Ok(allergies);
         }
-
-
     }
 }

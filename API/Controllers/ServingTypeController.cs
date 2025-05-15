@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-[Route("api/serving-type")]
+[Route("api/servingtypes")]
 [ApiController]
-public class ServingTypeController : BaseAPIController
+public class ServingTypesController : BaseAPIController
 {
     private readonly IUnitOfServices _unitOfServices;
-    public ServingTypeController(IUnitOfServices unitOfServices)
+    public ServingTypesController(IUnitOfServices unitOfServices)
     {
         _unitOfServices = unitOfServices;
     }

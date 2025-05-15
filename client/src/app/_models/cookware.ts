@@ -4,5 +4,5 @@ export interface Cookware {
   id: number;
   name: string;
   description: string;
-  photo : Photo
+  photoUrl : string,
 }

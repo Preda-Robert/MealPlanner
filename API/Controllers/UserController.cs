@@ -6,11 +6,11 @@ using API.Extensions;
 
 namespace API.Controllers;
 
-public class UserController : BaseAPIController
+public class UsersController : BaseAPIController
 {
     private readonly IUnitOfServices _unitOfServices;
 
-    public UserController(IUnitOfServices unitOfServices)
+    public UsersController(IUnitOfServices unitOfServices)
     {
         _unitOfServices = unitOfServices;
     }
@@ -18,7 +18,7 @@ public class UserController : BaseAPIController
     [HttpGet("{username}")]
     public async Task<ActionResult<MemberDTO>> GetUser(string username)
     {
-        var member = await _unitOfServices.UserService.GetUserByUsernameAsync(username, isCurrentUser: User.GetUsername() == username);
+        var member = await _unitOfServices.UserService.GetUserByUsernameAsync(username);
         return member;
     }
 

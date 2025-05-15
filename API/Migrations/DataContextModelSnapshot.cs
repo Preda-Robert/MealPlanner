@@ -27,7 +27,12 @@ namespace API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("RecipeId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("RecipeId");
 
                     b.ToTable("Allergies");
                 });
@@ -88,6 +93,9 @@ namespace API.Migrations
 
                     b.Property<DateTime?>("EmailVerificationCodeExpiry")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("HasDoneSetup")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");
@@ -648,6 +656,13 @@ namespace API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("API.Entities.Allergy", b =>
+                {
+                    b.HasOne("API.Entities.Recipe", null)
+                        .WithMany("Allergies")
+                        .HasForeignKey("RecipeId");
+                });
+
             modelBuilder.Entity("API.Entities.ApplicationUser", b =>
                 {
                     b.HasOne("API.Entities.Photo", "Photo")
@@ -1001,6 +1016,8 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Entities.Recipe", b =>
                 {
+                    b.Navigation("Allergies");
+
                     b.Navigation("Cookware");
 
                     b.Navigation("Ingredients");

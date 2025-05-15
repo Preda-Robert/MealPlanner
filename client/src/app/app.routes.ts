@@ -10,6 +10,11 @@ import { adminGuard } from './_guards/admin.guard';
 import { LearnMoreComponent } from './learn-more/learn-more.component';
 import { AuthComponent } from './auth/auth.component';
 import { VerificationComponent } from './verification/verification.component';
+import { MemberDetailComponent } from './members/member-detail/member-detail.component';
+import { IngredientsComponent } from './ingredients/ingredients.component';
+import { RecipesComponent } from './recipes/recipes.component';
+import { CookwaresComponent } from './cookwares/cookwares.component';
+import { SetupSelectionComponent } from './setup-selection/setup-selection.component';
 
 export const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -20,6 +25,11 @@ export const routes: Routes = [
       {path: 'learn-more', component: LearnMoreComponent},
       {path: 'auth', component: AuthComponent},
       {path: 'verify-email', component: VerificationComponent},
+      {path: 'ingredients', component: IngredientsComponent},
+      {path: 'recipes', component: RecipesComponent},
+      {path: 'cookwares', component: CookwaresComponent},
+      {path: 'member-details', component: MemberDetailComponent, resolve: {member: memberDetailedResolver}, canActivate: [authGuard]},
+      {path: 'setup-selection', component: SetupSelectionComponent}
     ]
   },
   {path: 'errors', component: TestErrorsComponent},

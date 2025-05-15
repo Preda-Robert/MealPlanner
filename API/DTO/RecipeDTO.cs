@@ -25,5 +25,4 @@ public class RecipeDTO
     public ICollection<CookwareDTO> Cookware { get; set; } = [];
     public ICollection<RecipeInstructionDTO> Instructions { get; set; } = [];
     public ICollection<RecipeIngredientDTO> Ingredients { get; set; } = [];
-
 }

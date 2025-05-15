@@ -27,6 +27,10 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     public ICookwareRepository CookwareRepository { get; }
     public IUserRepository UserRepository { get; }
     public IMealPlanRepository MealPlanRepository { get; }
+    public IRecipeInstructionRepository RecipeInstructionRepository { get; }
+    public IRecipeIngredientRepository RecipeIngredientRepository { get; }
+    public IRecipeCookwareRepository RecipeCookwareRepository { get; }
+    public IDietaryPreferenceRepository DietaryPreferenceRepository { get; }
     private readonly DataContext _context;
     private Dictionary<Type, object> _repositories;
     private readonly IServiceProvider _serviceProvider;
@@ -42,7 +46,11 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         ICookwareRepository cookwareRepository,
         IUserRepository userRepository,
         IPhotoRepository photoRepository,
-        IMealPlanRepository mealPlanRepository)
+        IMealPlanRepository mealPlanRepository,
+        IRecipeInstructionRepository recipeInstructionRepository,
+        IRecipeIngredientRepository recipeIngredientRepository,
+        IRecipeCookwareRepository recipeCookwareRepository,
+        IDietaryPreferenceRepository dietaryPreferenceRepository)
     {
         _context = context;
         _serviceProvider = serviceProvider;
@@ -55,6 +63,10 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         UserRepository = userRepository;
         PhotoRepository = photoRepository;
         MealPlanRepository = mealPlanRepository;
+        RecipeInstructionRepository = recipeInstructionRepository;
+        RecipeIngredientRepository = recipeIngredientRepository;
+        RecipeCookwareRepository = recipeCookwareRepository;
+        DietaryPreferenceRepository = dietaryPreferenceRepository;
         _repositories = new Dictionary<Type, object>();
     }
     public IBaseRepository<TEntity> Repository<TEntity>() where TEntity : class

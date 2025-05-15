@@ -16,5 +16,5 @@ public class Ingredient
     public float Calories { get; set; }
     public Photo? Photo { get; set; }
 
-    public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = null!;
+    public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = [];
 }

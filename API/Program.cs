@@ -67,6 +67,8 @@ try
     var unitOfServices = services.GetRequiredService<IUnitOfServices>();
     await context.Database.MigrateAsync();
     await Seed.SeedRoles(roleManager);
+    await Seed.SeedDietTypes(unitOfServices);
+    await Seed.SeedServingTypes(unitOfServices);
     await Seed.SeedAllergies(unitOfServices);
     await Seed.SeedIngredientCategories(unitOfServices);
     await Seed.SeedIngredients(unitOfServices);

@@ -11,5 +11,5 @@ public interface IRecipeRepository : IBaseRepository<Recipe>
     Task<ICollection<Recipe>?> GetRecipesAsync(RecipeParams recipeParams);
     Task<ICollection<Recipe>?> GetRecipesByUserIdAsync(string userId);
     Task<Recipe?> GetRecipeByNameAsync(string name);
-    Task<PagedList<Recipe>> GetRecipesByAllergyIdAsync(RecipeParams recipeParams);
+    IQueryable<Recipe> GetRecipes(RecipeParams recipeParams);
 }

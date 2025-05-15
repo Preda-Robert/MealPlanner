@@ -49,6 +49,7 @@ export class GoogleApiService {
   }
 
   loginWithGoogle(): void {
+    console.log('Logging in with Google...');
     this.oAuthService.initLoginFlow();
   }
 

@@ -6,5 +6,5 @@ namespace API.Interfaces;
 
 public interface IMealPlanRepository : IBaseRepository<MealPlan>
 {
-    Task<PagedList<MealPlan>> GetMealPlansAsync(MealPlanParams mealPlanParams);
+    IQueryable<MealPlan> GetMealPlans(MealPlanParams mealPlanParams);
 }

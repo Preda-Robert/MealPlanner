@@ -77,8 +77,11 @@ export class AuthComponent implements OnInit {
             sessionStorage.setItem('pendingLoginCredentials', JSON.stringify(credentials));
             sessionStorage.setItem('verificationUserId', user.id.toString());
             this.router.navigate(['/verify-email']);
-          } else if (user && user.emailConfirmed === true) {
-            this.router.navigate(['/profile']);
+          } else if (user && user.emailConfirmed === true && user.hasDoneSetup === true) {
+            this.router.navigate(['/member-details']);
+          }
+          else if (user && user.emailConfirmed === true && user.hasDoneSetup === false) {
+            this.router.navigate(['/setup-selection']);
           }
           if(typeof user === 'undefined')
           {
@@ -86,7 +89,14 @@ export class AuthComponent implements OnInit {
           }
 
         },
-        error: err => this.validationErrors = err
+        error: err => {
+        if (err?.status === 401 || err?.status === 400) {
+            this.validationErrors = ['Invalid username or password'];
+          } else {
+            const fallback = err?.error?.message || err?.message || 'Something went wrong';
+            this.validationErrors = [fallback];
+          }
+        }
       });
     } else {
       this.authenticationService.register(this.authForm.value).subscribe({
@@ -99,7 +109,14 @@ export class AuthComponent implements OnInit {
           this.validationErrors = undefined;
           this.router.navigate(['/verify-email']);
         },
-        error: err => this.validationErrors = err
+        error: err => {
+          if (err?.status === 401 || err?.status === 400) {
+              this.validationErrors = ['Invalid username or password'];
+            } else {
+              const fallback = err?.error?.message || err?.message || 'Something went wrong';
+              this.validationErrors = [fallback];
+            }
+          }
       });
     }
   }

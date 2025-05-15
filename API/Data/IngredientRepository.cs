@@ -17,18 +17,29 @@ public class IngredientRepository : BaseRepository<Ingredient>, IIngredientRepos
     {
         return await _context.Ingredients
             .Include(i => i.Category)
+            .Include(i => i.Allergy)
             .FirstOrDefaultAsync(i => i.Name == name);
     }
 
-    public Task<PagedList<Ingredient>> GetIngredientsAsync(IngredientParams ingredientParams)
+    public IQueryable<Ingredient> GetIngredients(IngredientParams ingredientParams)
     {
         var query = _context.Ingredients.AsQueryable();
+
+        if (ingredientParams.AllergyIds != null && ingredientParams.AllergyIds.Count != 0)
+        {
+            query = query.Where(i => i.AllergyId.HasValue && ingredientParams.AllergyIds.Contains(i.AllergyId.Value));
+        }
 
         if (!string.IsNullOrEmpty(ingredientParams.SearchTerm))
         {
             query = query.Where(i => i.Name.ToLower().Contains(ingredientParams.SearchTerm.ToLower()));
         }
 
-        return PagedList<Ingredient>.CreateAsync(query, ingredientParams.PageNumber, ingredientParams.PageSize);
+        query = query.OrderBy(i => i.Name);
+        query = query
+            .Include(i => i.Category)
+            .Include(i => i.Allergy);
+
+        return query;
     }
 }

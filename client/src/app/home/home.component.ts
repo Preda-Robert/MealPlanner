@@ -1,5 +1,5 @@
 // home.component.ts
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -8,6 +8,7 @@ import {
   faKitchenSet
 } from '@fortawesome/free-solid-svg-icons';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthenticationService } from '../_services/authentication.service';
 
 interface Feature {
   title: string;
@@ -23,7 +24,7 @@ interface Feature {
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-
+  authenticationService = inject(AuthenticationService);
   faPlateWheat = faPlateWheat;
   faCartShopping = faCartShopping;
   faKitchenSet = faKitchenSet;

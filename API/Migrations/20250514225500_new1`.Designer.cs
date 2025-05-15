@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250514142335_new6")]
-    partial class new6
+    [Migration("20250514225500_new1`")]
+    partial class new1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,7 +30,12 @@ namespace API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("RecipeId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("RecipeId");
 
                     b.ToTable("Allergies");
                 });
@@ -651,6 +656,13 @@ namespace API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("API.Entities.Allergy", b =>
+                {
+                    b.HasOne("API.Entities.Recipe", null)
+                        .WithMany("Allergies")
+                        .HasForeignKey("RecipeId");
+                });
+
             modelBuilder.Entity("API.Entities.ApplicationUser", b =>
                 {
                     b.HasOne("API.Entities.Photo", "Photo")
@@ -1004,6 +1016,8 @@ namespace API.Migrations
 
             modelBuilder.Entity("API.Entities.Recipe", b =>
                 {
+                    b.Navigation("Allergies");
+
                     b.Navigation("Cookware");
 
                     b.Navigation("Ingredients");

@@ -26,6 +26,15 @@ public class AutoMapperProfiles: Profile
         CreateMap<ApplicationUser, UserDTO>()
             .ForMember(d => d.PhotoUrl, o => o.MapFrom(p => p.Photo!.Url));
 
+        CreateMap<RecipeCookware, RecipeCookwareDTO>();
+        CreateMap<RecipeCookwareDTO, RecipeCookware>();
+
+        CreateMap<DietaryPreferenceDTO, DietaryPreferences>();
+        CreateMap<DietaryPreferences, DietaryPreferenceDTO>();
+
+        CreateMap<RecipeCookware, CookwareDTO>();
+        CreateMap<CookwareDTO, RecipeCookware>();
+
         CreateMap<IngredientCategory, IngredientCategoryDTO>();
         CreateMap<IngredientCategoryDTO, IngredientCategory>();
 
@@ -36,8 +45,18 @@ public class AutoMapperProfiles: Profile
             .ForMember(d => d.PhotoUrl, o => o.MapFrom(p => p.Photo!.Url));
         CreateMap<IngredientDTO, Ingredient>();
 
-        CreateMap<Recipe, RecipeDTO>();
-        CreateMap<RecipeDTO, Recipe>();
+        CreateMap<Recipe, RecipeDTO>()
+            .ForMember(dest => dest.Ingredients, opt => opt.MapFrom(src => src.Ingredients))
+            .ForMember(dest => dest.Cookware, opt => opt.MapFrom(src => src.Cookware.Select(rc => rc.Cookware)))
+            .ForMember(dest => dest.Instructions, opt => opt.MapFrom(src => src.Instructions))
+            .ForMember(dest => dest.ServingType, opt => opt.MapFrom(src => src.ServingType));
+
+        CreateMap<RecipeDTO, Recipe>()
+            .ForMember(dest => dest.Ingredients, opt => opt.Ignore()) 
+            .ForMember(dest => dest.Cookware, opt => opt.Ignore())
+            .ForMember(dest => dest.Instructions, opt => opt.Ignore())
+            .ForMember(dest => dest.Allergies, opt => opt.Ignore())
+            .ForMember(dest => dest.ServingType, opt => opt.MapFrom(src => src.ServingType));
 
         CreateMap<RecipeIngredient, RecipeIngredientDTO>();
         CreateMap<RecipeIngredientDTO, RecipeIngredient>();

@@ -12,6 +12,7 @@ public class ApplicationUser : IdentityUser<int>
         public ICollection<Recipe> Recipes { get; set; } = [];
         public ICollection<ApplicationUserRecipe> FavoriteRecipes { get; set; } = [];
         public DietaryPreferences DietaryPreferences { get; set; } = null!;
+        public bool HasDoneSetup { get; set; } = false;
         public string? EmailVerificationCode { get; set; }
         public DateTime? EmailVerificationCodeExpiry { get; set; }
         public string? PasswordResetCode { get; set; }

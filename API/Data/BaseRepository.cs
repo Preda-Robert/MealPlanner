@@ -20,24 +20,26 @@ namespace API.Repositories
             _dbSet = context.Set<TEntity>();
         }
 
-        public async Task<TEntity> GetByIdAsync(int id)
+        public virtual async Task<TEntity> GetByIdAsync(int id)
         {
             return await _dbSet.FindAsync(id) ?? throw new Exception($"Entity with ID {id} not found");
         }
 
-        public async Task<ICollection<TEntity>> GetAllAsync()
+        public virtual async Task<ICollection<TEntity>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<ICollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
+        public virtual async Task<ICollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
         {
             return await _dbSet.Where(predicate).ToListAsync();
         }
 
-        public async Task AddAsync(TEntity entity)
+        public virtual async Task<TEntity> AddAsync(TEntity entity)
         {
             await _dbSet.AddAsync(entity);
+            _context.Entry(entity).State = EntityState.Added;
+            return entity;
             
         }
 

@@ -6,24 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class new6 : Migration
+    public partial class new1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Allergies",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Allergies", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -98,6 +85,20 @@ namespace API.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Allergies",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    RecipeId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Allergies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -559,6 +560,11 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Allergies_RecipeId",
+                table: "Allergies",
+                column: "RecipeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ApplicationUserRecipe_TargetRecipeId",
                 table: "ApplicationUserRecipe",
                 column: "TargetRecipeId");
@@ -727,6 +733,13 @@ namespace API.Migrations
                 column: "UserId");
 
             migrationBuilder.AddForeignKey(
+                name: "FK_Allergies_Recipes_RecipeId",
+                table: "Allergies",
+                column: "RecipeId",
+                principalTable: "Recipes",
+                principalColumn: "Id");
+
+            migrationBuilder.AddForeignKey(
                 name: "FK_ApplicationUserRecipe_AspNetUsers_SourceUserId",
                 table: "ApplicationUserRecipe",
                 column: "SourceUserId",
@@ -778,8 +791,8 @@ namespace API.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Recipes_AspNetUsers_UserId",
-                table: "Recipes");
+                name: "FK_Photos_Recipes_RecipeId",
+                table: "Photos");
 
             migrationBuilder.DropTable(
                 name: "ApplicationUserRecipe");
@@ -845,16 +858,16 @@ namespace API.Migrations
                 name: "IngredientCategories");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "Photos");
-
-            migrationBuilder.DropTable(
                 name: "Recipes");
 
             migrationBuilder.DropTable(
+                name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
                 name: "ServingTypes");
+
+            migrationBuilder.DropTable(
+                name: "Photos");
         }
     }
 }

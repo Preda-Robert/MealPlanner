@@ -14,6 +14,10 @@ namespace API.Interfaces
         IUserRepository UserRepository { get; }
         IPhotoRepository PhotoRepository { get; }
         IMealPlanRepository MealPlanRepository { get; }
+        IRecipeInstructionRepository RecipeInstructionRepository { get; }
+        IRecipeIngredientRepository RecipeIngredientRepository { get; }
+        IRecipeCookwareRepository RecipeCookwareRepository { get; }
+        IDietaryPreferenceRepository DietaryPreferenceRepository { get; }
 
         IBaseRepository<TEntity> Repository<TEntity>() where TEntity : class;
         Task<bool> SaveAsync();

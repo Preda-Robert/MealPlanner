@@ -11,5 +11,5 @@ public interface IAllergyRepository : IBaseRepository<Allergy>
     Task<bool> AllergyExistsAsync(int id);
     Task<ICollection<Allergy>> GetAllAllergiesAsync();
     Task<ICollection<Allergy>> GetAllAllergiesByUserIdAsync(string userId);
-    Task<PagedList<Allergy>> GetAllergiesAsync(AllergyParams allergyParams);
+    IQueryable<Allergy> GetAllergiesAsync(AllergyParams allergyParams);
 }

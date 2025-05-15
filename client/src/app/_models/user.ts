@@ -1,9 +1,10 @@
 export interface User {
   id: number;
-  username: string;
+  userName: string;
   displayName: string,
   token: string,
   refreshToken: string,
   photoUrl: string,
   emailConfirmed: boolean
+  hasDoneSetup: boolean
 }

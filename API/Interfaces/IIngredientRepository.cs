@@ -7,5 +7,5 @@ namespace API.Interfaces;
 public interface IIngredientRepository : IBaseRepository<Ingredient>
 {
     Task<Ingredient?> GetIngredientByNameAsync(string name);
-    Task<PagedList<Ingredient>> GetIngredientsAsync(IngredientParams ingredientParams);
+    IQueryable<Ingredient> GetIngredients(IngredientParams ingredientParams);
 }

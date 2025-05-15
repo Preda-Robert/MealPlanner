@@ -12,7 +12,7 @@ public static class ClaimsPrincipleExtensions
     }
     public static int GetUserId(this ClaimsPrincipal user)
     {
-        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new Exception("Invalid user id");
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "-1";
         return int.Parse(userId);
     }
 }

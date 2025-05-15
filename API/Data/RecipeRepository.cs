@@ -33,20 +33,23 @@ public class RecipeRepository : BaseRepository<Recipe>, IRecipeRepository
         return await _context.Recipes.FirstOrDefaultAsync(r => r.Name == name);
     }
 
-    public Task<PagedList<Recipe>> GetRecipesByAllergyIdAsync(RecipeParams recipeParams)
+    public IQueryable<Recipe> GetRecipes(RecipeParams recipeParams)
     {
         var query = _context.Recipes.AsQueryable();
+        var userId = recipeParams.UserId;
+        
+        if (userId > 0)
+        {
+            query = query.Where(r => r.User.Id == userId);
+        }
 
         if (!string.IsNullOrEmpty(recipeParams.SearchTerm))
         {
             query = query.Where(a => a.Name.ToLower().Contains(recipeParams.SearchTerm.ToLower()));
         }
 
-        foreach (var allergyId in recipeParams.AllergyIds)
-        {
-            query = query.Where(a => a.Id != allergyId);
-        }
+        query = query.OrderBy(a => a.Name);
 
-        return PagedList<Recipe>.CreateAsync(query, recipeParams.PageNumber, recipeParams.PageSize);
+        return query;
     }
 }

@@ -16,6 +16,7 @@ public interface IUnitOfServices : IDisposable
     IAuthService AuthService { get; }
     IPhotoService PhotoService { get; }
     IMealPlanService MealPlanService { get; }
+    IDietaryPreferenceService DietaryPreferenceService { get; }
     IBaseService<TEntity, TDTO> Service<TEntity, TDTO>()
         where TEntity : class
         where TDTO : class;

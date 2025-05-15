@@ -6,6 +6,7 @@ namespace API.DTO;
 
 public class IngredientCategoryDTO
 {
+    public int Id { get; set; }
     [Required]
     public string Name { get; set; } = string.Empty;
     [JsonIgnore]

@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-[Route("api/diet-type")]
+[Route("api/diettypes")]
 [ApiController]
-public class DietTypeController : BaseAPIController
+public class DietTypesController : BaseAPIController
 {
     private readonly IUnitOfServices _unitOfServices;
-    public DietTypeController(IUnitOfServices unitOfServices)
+    public DietTypesController(IUnitOfServices unitOfServices)
     {
         _unitOfServices = unitOfServices;
     }

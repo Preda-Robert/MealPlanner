@@ -3,6 +3,7 @@ using System.Text.Json;
 using API.DTO;
 using API.Entities;
 using API.Interfaces;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Identity;
 
 namespace API.Helpers;
@@ -37,12 +38,9 @@ public class Seed
         };  
         var allergiesList = JsonSerializer.Deserialize<List<AllergyDTO>>(allergies, options);
         var allergiesInDbResult = await unitOfServices.AllergyService.GetAllAsync();
+        Console.WriteLine(allergiesInDbResult);
         var allergiesInDb = allergiesInDbResult.Value;
-        if(allergiesInDb == null)
-        {
-            allergiesInDb = [];
-        }
-        else
+        if(allergiesInDb != null)
         {
             return;
         }
@@ -67,17 +65,53 @@ public class Seed
         Console.Write(categoriesList);
         var categoriesInDbResult = await unitOfServices.IngredientCategoryService.GetAllAsync();
         var categoriesInDb = categoriesInDbResult.Value;
-        if(categoriesInDb == null)
-        {
-            categoriesInDb = [];
-        }
-        else
+        if(categoriesInDb != null)
         {
             return;
         }
         foreach (var category in categoriesList!)
         {
             await unitOfServices.IngredientCategoryService.Create(category);
+        }
+    }
+    
+    public static async Task SeedDietTypes(IUnitOfServices unitOfServices)
+    {
+        var dietTypes = await File.ReadAllTextAsync("Helpers/DietTypes.json");
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };  
+        var dietTypesList = JsonSerializer.Deserialize<List<DietTypeDTO>>(dietTypes, options);
+        var dietTypesInDbResult = await unitOfServices.Service<DietType, DietTypeDTO>().GetAllAsync();
+        var dietTypesInDb = dietTypesInDbResult.Value;
+        if(dietTypesInDb != null)
+        {
+            return;
+        }
+        foreach (var dietType in dietTypesList!)
+        {
+            await unitOfServices.Service<DietType, DietTypeDTO>().Create(dietType);
+        }
+    }
+
+    public static async Task SeedServingTypes(IUnitOfServices unitOfServices)
+    {
+        var servingTypes = await File.ReadAllTextAsync("Helpers/ServingTypes.json");
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };  
+        var servingTypesList = JsonSerializer.Deserialize<List<ServingTypeDTO>>(servingTypes, options);
+        var servingTypesInDbResult = await unitOfServices.ServingTypeService.GetAllAsync();
+        var servingTypesInDb = servingTypesInDbResult.Value;
+        if(servingTypesInDb != null)
+        {
+            return;
+        }
+        foreach (var servingType in servingTypesList!)
+        {
+            await unitOfServices.ServingTypeService.Create(servingType);
         }
     }
 
@@ -87,15 +121,11 @@ public class Seed
         var options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
-        };  
+        };
         var ingredientsList = JsonSerializer.Deserialize<List<IngredientDTO>>(ingredients, options);
         var ingredientsInDbResult = await unitOfServices.IngredientService.GetAllAsync();
         var ingredientsInDb = ingredientsInDbResult.Value;
-        if(ingredientsInDb == null)
-        {
-            ingredientsInDb = [];
-        }
-        else
+        if (ingredientsInDb != null)
         {
             return;
         }
@@ -115,11 +145,7 @@ public class Seed
         var cookwaresList = JsonSerializer.Deserialize<List<CookwareDTO>>(cookwares, options);
         var cookwaresInDbResult = await unitOfServices.CookwareService.GetAllAsync();
         var cookwaresInDb = cookwaresInDbResult.Value;
-        if(cookwaresInDb == null)
-        {
-            cookwaresInDb = [];
-        }
-        else
+        if(cookwaresInDb != null)
         {
             return;
         }
@@ -139,11 +165,7 @@ public class Seed
         var recipesList = JsonSerializer.Deserialize<List<RecipeDTO>>(recipes, options);
         var recipesInDbResult = await unitOfServices.RecipeService.GetAllAsync();
         var recipesInDb = recipesInDbResult.Value;
-        if(recipesInDb == null)
-        {
-            recipesInDb = [];
-        }
-        else
+        if(recipesInDb != null)
         {
             return;
         }

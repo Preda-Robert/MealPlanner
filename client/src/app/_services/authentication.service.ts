@@ -12,6 +12,8 @@ import { EmailVerification } from '../_models/emailVerification';
 import { ResetPasswordRequest } from '../_models/password-reset';
 import { GoogleApiService } from './google-api.service';
 import { RegisterResponse } from '../_models/registerResponse';
+import { DietaryPreference } from '../_models/dietaryPreference';
+import { SaveDietPreference } from '../_models/saveDietPreference';
 
 
 @Injectable({
@@ -65,15 +67,14 @@ export class AuthenticationService {
           if(user.emailConfirmed !== false)
           {
             this.setCurrentUser(user);
+            localStorage.setItem('user', JSON.stringify(user));
           }
           return user;
         }
         return undefined;
       },
       catchError(error => {
-        if (error.status === 400) {
-          this.toastr.error(error.error);
-        } else {
+        if (error.status !== 400) {
           this.toastr.error('Login failed');
         }
         return throwError(() => 'Login failed. Please try again.');
@@ -89,11 +90,7 @@ export class AuthenticationService {
         return true;
       }),
       catchError(error => {
-        if (error.status === 400) {
-          this.toastr.error(error.error);
-        } else {
           this.toastr.error('Email verification failed');
-        }
         return throwError(() => 'Email verification failed. Please try again.');
       })
     );
@@ -125,6 +122,7 @@ export class AuthenticationService {
         //console.log('HTTP response received:', user);
         if (user) {
           this.setCurrentUser(user);
+          localStorage.setItem('user', JSON.stringify(user));
           this.toastr.success('Logged in with Google successfully');
           return user;
         }
@@ -171,6 +169,27 @@ export class AuthenticationService {
       })
     );
   }
+
+  doneSelection(dietpreferences : SaveDietPreference) {
+    this.logout();
+    let user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user && user.id) {
+      this.http.get<User>(this.baseUrl + 'user/' + user.id).subscribe({
+        next: (response) => {
+          if (response) {
+            user = response;
+            user.hasDoneSetup = true;
+            this.setCurrentUser(user);
+            localStorage.setItem('user', JSON.stringify(user));
+          }
+        }
+      });
+    }
+    user = JSON.parse(localStorage.getItem('user') || '{}');
+    this.currentUser.set(user);
+    this.toastr.info('Please log in again to update your profile');
+  }
+
 
   setCurrentUser(user: User) {
     localStorage.setItem('user', JSON.stringify(user));

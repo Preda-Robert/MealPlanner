@@ -1,15 +1,17 @@
 using System;
 using API.DTO;
+using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-public class CookwareController : BaseAPIController
+public class CookwaresController : BaseAPIController
 {
     private readonly IUnitOfServices _unitOfServices;
 
-    public CookwareController(IUnitOfServices unitOfServices)
+    public CookwaresController(IUnitOfServices unitOfServices)
     {
         _unitOfServices = unitOfServices;
     }
@@ -22,9 +24,12 @@ public class CookwareController : BaseAPIController
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CookwareDTO>>> GetAllCookware()
+    public async Task<ActionResult<ICollection<CookwareDTO>>> GetCookwares([FromQuery] CookwareParams cookwareParams)
     {
-        var cookwareList = await _unitOfServices.CookwareService.GetAllAsync();
-        return Ok(cookwareList);
+        cookwareParams.CurrentUser = User.GetUserId();
+        var cookwaresServiceResult = await _unitOfServices.CookwareService.GetAllAsync(cookwareParams);
+        var cookwares = cookwaresServiceResult.Value!;
+        Response.AddPaginationHeader(cookwares.CurrentPage, cookwares);
+        return Ok(cookwares);
     }
 }

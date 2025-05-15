@@ -1,81 +1,89 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { TabDirective, TabsetComponent } from 'ngx-bootstrap/tabs';
-import { GalleryModule } from 'ng-gallery';
+import {
+  Component, signal, inject, OnInit
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TimeagoModule } from 'ngx-timeago';
-import { MemberMessagesComponent } from '../member-messages/member-messages.component';
+import { Member } from '../../_models/member';
+import { CommonModule } from '@angular/common';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { MemberService } from '../../_services/member.service';
+import { RecipeService } from '../../_services/recipe.service';
+import { MealPlanService } from '../../_services/meal-plan.service';
 
 @Component({
   selector: 'app-member-detail',
   templateUrl: './member-detail.component.html',
   styleUrls: ['./member-detail.component.css'],
   standalone: true,
-  imports: [CommonModule, GalleryModule, TimeagoModule, MemberMessagesComponent]
+  imports: [CommonModule, TimeagoModule, PaginationModule, FormsModule]
 })
 export class MemberDetailComponent implements OnInit {
-  @ViewChild('memberTabs', { static: true }) memberTabs?: TabsetComponent;
-  member: MemberDTO = {} as MemberDTO;
-  images: any[] = [];
-  activeTab?: TabDirective;
+  member = signal<Member | null>(null);
 
-  constructor(
-    private memberService: MemberService,
-    private route: ActivatedRoute
-  ) {}
+  recipeSearchQuery = '';
+  mealPlanSearchQuery = '';
+
+  memberService = inject(MemberService);
+  recipeService = inject(RecipeService);
+  mealPlanService = inject(MealPlanService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
 
   ngOnInit(): void {
-    this.loadMember();
-  }
-
-  loadMember() {
-    const username = this.route.snapshot.paramMap.get('username');
-    if (!username) return;
-
-    this.memberService.getMember(username).subscribe({
-      next: member => {
-        this.member = member;
-        this.loadGalleryImages();
+    this.memberService.loadMember().subscribe({
+      next: (member: Member | null) => {
+        this.member.set(member);
+        if (member?.userName) {
+          this.loadMemberRecipes();
+          this.loadMemberMealPlans();
+        }
+      },
+      error: error => {
+        console.error('Failed to load member:', error);
       }
     });
   }
 
-  loadGalleryImages() {
-    // This is assuming you have photo entities in your member object
-    // Adjust according to your actual data structure
-    if (this.member.photoUrl) {
-      this.images = [{ src: this.member.photoUrl, thumb: this.member.photoUrl }];
-    }
-
-    // If you have a collection of photos, you might do something like:
-    // this.images = this.member.photos?.map(photo => {
-    //   return { src: photo.url, thumb: photo.url };
-    // }) || [];
+  loadMemberRecipes() {
+    if (!this.member()?.userName) return;
+    this.recipeService.getRecipes(this.recipeSearchQuery);
   }
 
-  selectTab(heading: string) {
-    if (this.memberTabs) {
-      const tab = this.memberTabs.tabs.find(tab => tab.heading === heading);
-      if (tab) {
-        tab.active = true;
-      }
+  loadMemberMealPlans() {
+    if (!this.member()?.userName) return;
+    this.mealPlanService.getMealPlans(this.mealPlanSearchQuery);
+  }
+
+  onRecipePageChanged(event: any) {
+    if (this.recipeService.recipeParams().pageNumber !== event.page) {
+      this.recipeService.recipeParams().pageNumber = event.page;
+      this.loadMemberRecipes();
     }
   }
 
-  onTabActivated(data: TabDirective) {
-    this.activeTab = data;
+  onMealPlanPageChanged(event: any) {
+    if (this.mealPlanService.mealPlanParams().pageNumber !== event.page) {
+      this.mealPlanService.mealPlanParams().pageNumber = event.page;
+      this.loadMemberMealPlans();
+    }
+  }
+
+  onRecipeSearch() {
+    this.recipeService.recipeParams().pageNumber = 1;
+    this.loadMemberRecipes();
+  }
+
+  onMealPlanSearch() {
+    this.mealPlanService.mealPlanParams().pageNumber = 1;
+    this.loadMemberMealPlans();
   }
 
   toggleLike() {
-    this.memberService.toggleLike(this.member.userName).subscribe({
-      next: () => {
-        this.loadMember();
-      }
-    });
+    // Implement like toggling if needed
   }
 
   hasLiked(): boolean {
-
     return false;
   }
 }

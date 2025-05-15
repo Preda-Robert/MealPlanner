@@ -17,6 +17,7 @@ namespace API.Entities;
         public RecipeDifficulty Difficulty { get; set; } = RecipeDifficulty.Easy;
         public ServingType ServingType { get; set; } = null!;
         public DateTime DateAdded { get; set; } = DateTime.UtcNow;
+        public ICollection<Allergy> Allergies { get; set; } = [];
         public ICollection<RecipeCookware> Cookware { get; set; } = [];
         public ICollection<RecipeInstruction> Instructions { get; set; } = [];
         public ICollection<RecipeIngredient> Ingredients { get; set; } = [];

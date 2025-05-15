@@ -1,16 +1,21 @@
 using System;
+using API.DTO;
 using API.Entities;
 using API.Helpers;
 using API.Interfaces;
 using API.Repositories;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
-public class AllergyRepository : BaseRepository<Allergy>,IAllergyRepository
+public class AllergyRepository : BaseRepository<Allergy>, IAllergyRepository
 {
-    public AllergyRepository(DataContext context) : base(context)
+    private IMapper _mapper;
+    public AllergyRepository(DataContext context, IMapper mapper) : base(context)
     {
+        _mapper = mapper;
     }
 
     public async Task<bool> AllergyExistsAsync(string name)
@@ -32,17 +37,30 @@ public class AllergyRepository : BaseRepository<Allergy>,IAllergyRepository
     {
         throw new NotImplementedException();
     }
-
-    public Task<PagedList<Allergy>> GetAllergiesAsync(AllergyParams allergyParams)
+    public IQueryable<Allergy> GetAllergiesAsync(AllergyParams allergyParams)
     {
-        var query = _context.Allergies.AsQueryable();
+        IQueryable<Allergy> query;
+
+        if (allergyParams.CurrentUser > -1)
+        {
+            query = _context.Users
+                .Where(u => u.Id == allergyParams.CurrentUser)
+                .SelectMany(u => u.DietaryPreferences.Allergies)
+                .AsQueryable();
+        }
+        else
+        {
+            query = _context.Allergies.AsQueryable();
+        }
 
         if (!string.IsNullOrEmpty(allergyParams.SearchTerm))
         {
-            query = query.Where(a => a.Name.ToLower().Contains(allergyParams.SearchTerm.ToLower()));
+            query = query.Where(a => a.Name.Contains(allergyParams.SearchTerm));
         }
 
-        return PagedList<Allergy>.CreateAsync(query, allergyParams.PageNumber, allergyParams.PageSize);
+        query = query.OrderBy(a => a.Name);
+
+        return query;
     }
 
     public async Task<Allergy?> GetAllergyByNameAsync(string name)

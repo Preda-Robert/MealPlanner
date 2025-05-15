@@ -1,0 +1,88 @@
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card recipe-details-card">
+
+        <div class="card-header bg-primary text-white">
+          <h2 class="mb-0">{{ recipe?.name }}</h2>
+        </div>
+
+        <img class="card-img-top" [src]="recipe?.photoUrl || 'https://placehold.co/600x400'" [alt]="recipe?.name" style="max-height: 400px; object-fit: cover;">
+        <div class="card-body">
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <p><strong>Description:</strong> {{ recipe?.description }}</p>
+              <p><strong>Cooking Time:</strong> {{ recipe?.cookingTime }} minutes</p>
+              <p><strong>Rating:</strong> {{ recipe?.rating }}/5</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Difficulty:</strong>
+                <span class="badge rounded-pill" [ngClass]="{
+                  'bg-success': recipe?.Difficulty === 'Easy',
+                  'bg-warning': recipe?.Difficulty === 'Medium',
+                  'bg-danger': recipe?.Difficulty === 'Hard'
+                }">{{ recipe?.Difficulty }}</span>
+              </p>
+              <p><strong>Servings:</strong> {{ recipe?.servingType?.description }}</p>
+              <p><strong>Date Added:</strong> {{ recipe?.dateAdded | date:'mediumDate' }}</p>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <h5>Allergies</h5>
+            <div *ngIf="recipe?.allergies?.length; else noAllergies">
+              <span *ngFor="let allergy of recipe?.allergies" class="badge bg-info me-1">{{ allergy.name }}</span>
+            </div>
+            <ng-template #noAllergies>
+              <p class="text-muted">No allergies specified.</p>
+            </ng-template>
+          </div>
+
+          <div class="mb-3">
+            <h5>Cookware Needed</h5>
+            <div *ngIf="recipe?.cookware?.length; else noCookware">
+              <ul class="list-group">
+                <li *ngFor="let item of recipe?.cookware" class="list-group-item">
+                  {{ item.name }}: {{ item.description }}
+                </li>
+              </ul>
+            </div>
+            <ng-template #noCookware>
+              <p class="text-muted">No cookware specified.</p>
+            </ng-template>
+          </div>
+
+          <div class="mb-3">
+            <h5>Ingredients</h5>
+            <div *ngIf="recipe?.recipeIngredients?.length; else noIngredients">
+              <ul class="list-group">
+                <li *ngFor="let ingredient of recipe?.recipeIngredients" class="list-group-item">
+                  {{ ingredient.quantity }} {{ ingredient.ingredient.name }}
+                </li>
+              </ul>
+            </div>
+            <ng-template #noIngredients>
+              <p class="text-muted">No ingredients specified.</p>
+            </ng-template>
+          </div>
+          <!-- Instructions -->
+          <div class="mb-3">
+            <h5>Instructions</h5>
+            <div *ngIf="recipe?.recipeInstructions?.length; else noInstructions">
+              <ol class="list-group list-group-numbered">
+                <li *ngFor="let instruction of recipe?.recipeInstructions! | orderBy:'instructionIndex'" class="list-group-item">
+                  {{ instruction.description }}
+                </li>
+              </ol>
+            </div>
+            <ng-template #noInstructions>
+              <p class="text-muted">No instructions specified.</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

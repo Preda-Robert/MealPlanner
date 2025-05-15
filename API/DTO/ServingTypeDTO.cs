@@ -5,6 +5,7 @@ namespace API.DTO;
 
 public class ServingTypeDTO
 {
+    public int Id { get; set; }
     public int NumberOfServings { get; set; }
     [MinLength(5)]
     [MaxLength(255)]

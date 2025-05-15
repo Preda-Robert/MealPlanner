@@ -8,6 +8,16 @@
       <p class="lead text-muted mb-4">
         Simplify your cooking with personalized meal plans, smart recipes, and easy grocery lists.
       </p>
+      @if(authenticationService.currentUser())
+      {
+        <p class="lead text-muted mb-4">
+          Welcome back, {{authenticationService.currentUser()?.userName}}!
+        </p>
+      } @else
+      {
+        <p class="lead text-muted mb-4">
+          Join our community of food lovers and start your culinary journey today!
+        </p>
       <div class="d-flex justify-content-center justify-content-md-start gap-3 mb-3">
         <a class="btn btn-primary btn-lg" routerLink="/auth" routerLinkActive="true" >Get Started</a>
         <a class="btn btn-outline-secondary btn-lg " routerLink="/learn-more" routerLinkActive="true">Learn More</a>
@@ -15,6 +25,7 @@
       <p class="text-muted small">
         Join over 4,500,000 others for free today
       </p>
+      }
     </div>
 
     <div class="col-md-6 d-none d-md-block">

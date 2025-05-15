@@ -1,105 +1,121 @@
-<div class="row">
-  <div class="col-4">
-    <div class="card">
-      <img class="card-img img-thumbnail" [src]="member.photoUrl || './assets/user.png'" [alt]="member.displayName">
-      <div class="card-body">
-        <div>
-          <strong>Username:</strong>
-          <p>{{member.userName}}</p>
+<div class="container mt-4">
+  <div class="row">
+    <!-- Left Column: Recipes and Meal Plans -->
+    <div class="col-md-8">
+
+      <!-- Recipes Section -->
+      <div class="mb-5">
+        <h3 class="mb-3">Recipes</h3>
+        <div class="mb-4">
+          <input type="text" class="form-control" placeholder="Search recipes..."
+                 [(ngModel)]="recipeSearchQuery" (input)="onRecipeSearch()">
         </div>
-        <div>
-          <strong>Display Name:</strong>
-          <p>{{member.displayName}}</p>
+
+        <div class="row">
+          @if(recipeService.paginatedResult()?.items?.length) {
+            @for(recipe of recipeService.paginatedResult()?.items; track recipe.id) {
+              <div class="col-sm-6 col-lg-4 mb-4">
+                <div class="card recipe-card h-100">
+                  <img class="card-img-top" [src]="recipe.photoUrl || 'https://placehold.co/600x400'" [alt]="recipe.name">
+                  <div class="card-body">
+                    <h5 class="card-title">{{recipe.name}}</h5>
+                    <p class="card-text text-truncate">{{recipe.description}}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span><i class="fa fa-clock-o"></i> {{recipe.cookingTime}} min</span>
+                      <span class="badge rounded-pill" [ngClass]="{
+                        'bg-success': recipe.Difficulty === 'Easy',
+                        'bg-warning': recipe.Difficulty === 'Medium',
+                        'bg-danger': recipe.Difficulty === 'Hard'
+                      }">{{recipe.Difficulty}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <div class="d-flex justify-content-center mt-3">
+              <pagination [boundaryLinks]="true"
+                          [totalItems]="recipeService.paginatedResult()?.pagination!.totalItems"
+                          [itemsPerPage]="recipeService.paginatedResult()?.pagination!.itemsPerPage"
+                          [maxSize]="10"
+                          [(ngModel)]="recipeService.paginatedResult()?.pagination!.currentPage"
+                          (pageChanged)="onRecipePageChanged($event)">
+              </pagination>
+            </div>
+          } @else {
+            <div class="col-12 text-center mt-4">
+              <p>No recipes found for this user.</p>
+            </div>
+          }
         </div>
-        <div>
-          <strong>Dietary Preference:</strong>
-          <p>{{member.dietaryPreference?.name}}</p>
+      </div>
+
+      <!-- Meal Plans Section -->
+      <div>
+        <h3 class="mb-3">Meal Plans</h3>
+        <div class="mb-4">
+          <input type="text" class="form-control" placeholder="Search meal plans..."
+                 [(ngModel)]="mealPlanSearchQuery" (input)="onMealPlanSearch()">
         </div>
-        <div>
-          <strong>Created Recipes:</strong>
-          <p>{{member.createdRecipes?.length || 0}}</p>
+
+        <div class="row">
+          @if(mealPlanService.paginatedResult()?.items?.length) {
+            @for(mealPlan of mealPlanService.paginatedResult()?.items; track mealPlan.id) {
+              <div class="col-md-6 mb-4">
+                <div class="card meal-plan-card h-100">
+                  <div class="card-header">
+                    <h5 class="mb-0">{{mealPlan.name}}</h5>
+                  </div>
+                  <div class="card-body">
+                    <p class="card-text">{{mealPlan.description}}</p>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <div class="d-flex justify-content-center mt-3">
+              <pagination [boundaryLinks]="true"
+                          [totalItems]="mealPlanService.paginatedResult()?.pagination!.totalItems"
+                          [itemsPerPage]="mealPlanService.paginatedResult()?.pagination!.itemsPerPage"
+                          [maxSize]="10"
+                          [(ngModel)]="mealPlanService.paginatedResult()?.pagination!.currentPage"
+                          (pageChanged)="onMealPlanPageChanged($event)">
+              </pagination>
+            </div>
+          } @else {
+            <div class="col-12 text-center mt-4">
+              <p>No meal plans found for this user.</p>
+            </div>
+          }
         </div>
-        <div>
-          <strong>Favorite Recipes:</strong>
-          <p>{{member.favoriteRecipes?.length || 0}}</p>
-        </div>
-        <div>
-          <strong>Meal Plans:</strong>
-          <p>{{member.mealPlans?.length || 0}}</p>
-        </div>
-        <div class="card-footer">
-          <div class="btn-group d-flex">
-            <button (click)="toggleLike()" class="btn btn-primary">{{hasLiked() ? 'Favorited' : 'Add to Favorites'}}</button>
-            <button (click)="selectTab('Messages')" class="btn btn-success">Messages</button>
+      </div>
+    </div>
+
+    <!-- Right Column: Member Profile -->
+    <div class="col-md-4">
+      <div class="card member-card">
+        <img class="card-img-top" [src]="member()?.photoUrl || 'https://placehold.co/600x400'" [alt]="member()?.displayname">
+        <div class="card-body">
+          <h4 class="card-title">{{member()?.displayname}}</h4>
+          <p class="text-muted username">{{member()?.userName}}</p>
+
+          <hr>
+
+          <div class="mb-3">
+            <h5>Dietary Preference</h5>
+            <span class="badge rounded-pill bg-info">{{member()?.dietaryPreference?.dietType?.name || 'None'}}</span>
+          </div>
+
+          <div class="stats-container">
+            <div class="stat-item">
+              <span class="stat-label">Recipes {{member()?.createdRecipes?.length || 0}}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Meal Plans {{member()?.mealPlans?.length || 0}}</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="col-8">
-    <tabset #memberTabs class="member-tabset">
-      <tab heading="About {{member.displayName}}" (selectTab)="onTabActivated($event)">
-        <h4>Created Recipes</h4>
-        @if(member.createdRecipes?.length) {
-          <div class="row">
-            @for(recipe of member.createdRecipes; track recipe.id) {
-              <div class="col-md-6 mb-3">
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">{{recipe.name}}</h5>
-                    <p class="card-text">{{recipe.description | slice:0:100}}...</p>
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        } @else {
-          <p>No recipes created yet.</p>
-        }
-      </tab>
-      <tab heading="Favorite Recipes" (selectTab)="onTabActivated($event)">
-        <h4>Favorite Recipes</h4>
-        @if(member.favoriteRecipes?.length) {
-          <div class="row">
-            @for(recipe of member.favoriteRecipes; track recipe.id) {
-              <div class="col-md-6 mb-3">
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">{{recipe.name}}</h5>
-                    <p class="card-text">{{recipe.description | slice:0:100}}...</p>
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        } @else {
-          <p>No favorite recipes yet.</p>
-        }
-      </tab>
-      <tab heading="Meal Plans" (selectTab)="onTabActivated($event)">
-        <h4>Meal Plans</h4>
-        @if(member.mealPlans?.length) {
-          <div class="row">
-            @for(mealPlan of member.mealPlans; track mealPlan.id) {
-              <div class="col-md-6 mb-3">
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">{{mealPlan.name}}</h5>
-                    <p class="card-text">{{mealPlan.description}}</p>
-                    <p><strong>Start Date:</strong> {{mealPlan.startDate | date}}</p>
-                    <p><strong>End Date:</strong> {{mealPlan.endDate | date}}</p>
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        } @else {
-          <p>No meal plans created yet.</p>
-        }
-      </tab>
-      <tab heading="Messages" (selectTab)="onTabActivated($event)">
-        <app-member-messages [username]="member.userName"></app-member-messages>
-      </tab>
-    </tabset>
   </div>
 </div>
