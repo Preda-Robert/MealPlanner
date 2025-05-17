@@ -1,1 +1,27 @@
-<p>mealplans works!</p>
+<div class="container mt-4">
+  <h2>Meal Plan for {{ currentStart | date:'MMM d' }} - {{ currentEnd | date:'MMM d, y' }}</h2>
+
+  <div class="btn-group my-3">
+    <button class="btn btn-outline-primary" (click)="prevWeek()">← Previous Week</button>
+    <button class="btn btn-outline-primary" (click)="nextWeek()">Next Week →</button>
+  </div>
+
+  <div *ngIf="mealPlan; else noPlan">
+    <h4>{{ mealPlan?.name }}</h4>
+    <p>{{ mealPlan?.description }}</p>
+    <!-- <img *ngIf="mealPlan.photoUrl" [src]="mealPlan." class="img-fluid mb-3" /> -->
+
+    <ul class="list-group">
+      <li *ngFor="let item of mealPlan.mealPlanRecipes" class="list-group-item">
+        <strong>{{ item.recipe.description }}</strong> - {{ item.servingType.numberOfServings }}
+      </li>
+    </ul>
+  </div>
+
+  <ng-template #noPlan>
+    <div class="alert alert-warning">{{ error }}</div>
+    <p>No meal plan available for the selected week.</p>
+    <p>Try creating a new meal plan or adjusting your preferences.</p>
+    
+  </ng-template>
+</div>
