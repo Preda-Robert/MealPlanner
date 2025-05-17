@@ -19,6 +19,18 @@ export class MealPlanService {
   user = this.authenticationService.currentUser();
   mealPlanParams = signal<MealPlanParams>(new MealPlanParams());
 
+  getByDateRange(startDate: Date, endDate: Date) {
+  const userId = this.user?.id ?? 0;
+
+  return this.http.get<MealPlan>(this.baseUrl + 'mealplans/by-range', {
+    params: {
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      userId: userId.toString()
+    }
+  });
+}
+
 
   getMealPlans(searchTerm: string = '') {
     const response = this.mealPlanCache.get(Object.values(this.mealPlanParams()).join('-'));

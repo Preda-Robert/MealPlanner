@@ -12,5 +12,6 @@ public class MealPlanDTO
     [Required]
     public required string Description { get; set; }
     public string? PhotoUrl { get; set; }
+    
     public ICollection<MealPlanRecipeDTO> MealPlanRecipes { get; set; } = [];
 }
