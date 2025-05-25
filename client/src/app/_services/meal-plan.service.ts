@@ -38,6 +38,10 @@ export class MealPlanService {
     });
   }
 
+  getMealPlanById(id: number) {
+    return this.http.get<MealPlan>(this.baseUrl + 'mealplans/' + id);
+  }
+
   createMealPlan(mealPlan: any) {
     // Clear cache when creating new meal plan
     this.mealPlanCache.clear();
@@ -46,12 +50,16 @@ export class MealPlanService {
   }
 
   updateMealPlan(id: number, mealPlan: any) {
+    // Clear cache when updating meal plan
     this.mealPlanCache.clear();
+    
     return this.http.put<MealPlan>(this.baseUrl + 'mealplans/' + id, mealPlan);
   }
 
   deleteMealPlan(id: number) {
+    // Clear cache when deleting meal plan
     this.mealPlanCache.clear();
+    
     return this.http.delete(this.baseUrl + 'mealplans/' + id);
   }
 

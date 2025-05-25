@@ -20,11 +20,25 @@ export class MealPlansComponent implements OnInit {
   currentEnd!: Date;
   mealPlan?: MealPlan;
   error?: string;
+  success?: string;
   showCreateMealPlanForm = false;
+  showEditMealPlanForm = false;
   isCreating = false;
+  isUpdating = false;
+  isDeleting = false;
   
   // Form data
   newMealPlan = {
+    name: '',
+    description: '',
+    startDate: new Date(),
+    endDate: new Date(),
+    userId: 0,
+    mealPlanRecipes: [] as any[]
+  };
+
+  editMealPlan = {
+    id: 0,
     name: '',
     description: '',
     startDate: new Date(),
@@ -36,7 +50,9 @@ export class MealPlansComponent implements OnInit {
   // Recipe selection
   availableRecipes: Recipe[] = [];
   selectedRecipes: Recipe[] = [];
+  editSelectedRecipes: Recipe[] = [];
   recipeSearchTerm = '';
+  editRecipeSearchTerm = '';
 
   private mealPlanService = inject(MealPlanService);
   private recipeService = inject(RecipeService);
@@ -87,6 +103,15 @@ export class MealPlansComponent implements OnInit {
     this.availableRecipes = this.recipeService.paginatedResult()?.items || [];
   }
 
+  searchEditRecipes() {
+    if (this.editRecipeSearchTerm.trim()) {
+      this.recipeService.getRecipes(this.editRecipeSearchTerm);
+    } else {
+      this.recipeService.getRecipes();
+    }
+    this.availableRecipes = this.recipeService.paginatedResult()?.items || [];
+  }
+
   toggleRecipeSelection(recipe: Recipe, event: any) {
     if (event.target.checked) {
       if (!this.selectedRecipes.find(r => r.id === recipe.id)) {
@@ -97,12 +122,36 @@ export class MealPlansComponent implements OnInit {
     }
   }
 
+  toggleEditRecipeSelection(recipe: Recipe, event: any) {
+    if (event.target.checked) {
+      if (!this.editSelectedRecipes.find(r => r.id === recipe.id)) {
+        this.editSelectedRecipes.push(recipe);
+      }
+    } else {
+      this.editSelectedRecipes = this.editSelectedRecipes.filter(r => r.id !== recipe.id);
+    }
+  }
+
   removeRecipeFromSelection(recipe: Recipe) {
     this.selectedRecipes = this.selectedRecipes.filter(r => r.id !== recipe.id);
   }
 
+  removeRecipeFromEditSelection(recipe: Recipe) {
+    this.editSelectedRecipes = this.editSelectedRecipes.filter(r => r.id !== recipe.id);
+  }
+
+  isRecipeSelected(recipe: Recipe): boolean {
+    return this.selectedRecipes.some(r => r.id === recipe.id);
+  }
+
+  isRecipeSelectedForEdit(recipe: Recipe): boolean {
+    return this.editSelectedRecipes.some(r => r.id === recipe.id);
+  }
+
   createMealPlan() {
     this.isCreating = true;
+    this.error = undefined;
+    this.success = undefined;
     
     // Prepare meal plan data
     const currentUser = this.authService.currentUser();
@@ -127,6 +176,8 @@ export class MealPlansComponent implements OnInit {
         this.resetForm();
         this.isCreating = false;
         this.error = undefined;
+        this.success = 'Meal plan created successfully!';
+        setTimeout(() => this.success = undefined, 3000);
       },
       error: (err) => {
         this.error = err.error || 'Failed to create meal plan';
@@ -135,9 +186,97 @@ export class MealPlansComponent implements OnInit {
     });
   }
 
+  showEditForm() {
+    if (!this.mealPlan) return;
+    
+    // Populate edit form with current meal plan data
+    this.editMealPlan = {
+      id: this.mealPlan.id,
+      name: this.mealPlan.name,
+      description: this.mealPlan.description || '',
+      startDate: new Date(this.mealPlan.startDate),
+      endDate: new Date(this.mealPlan.endDate),
+      userId: this.mealPlan.userId,
+      mealPlanRecipes: [...this.mealPlan.mealPlanRecipes]
+    };
+
+    // Extract recipes correctly from mealPlanRecipes
+    this.editSelectedRecipes = this.mealPlan.mealPlanRecipes.map(mpr => ({
+      ...mpr.recipe,
+      servingType: mpr.servingType
+    }));
+    
+    this.showEditMealPlanForm = true;
+  }
+
+  updateMealPlan() {
+    if (!this.mealPlan) return;
+    
+    this.isUpdating = true;
+    this.error = undefined;
+    this.success = undefined;
+
+    // Map selected recipes to meal plan recipes
+    this.editMealPlan.mealPlanRecipes = this.editSelectedRecipes.map(recipe => ({
+      recipeId: recipe.id,
+      servingTypeId: recipe.servingType.id,
+      recipe: {
+        id: recipe.id,
+        name: recipe.name,
+        description: recipe.description
+      },
+      servingType: recipe.servingType
+    }));
+
+    this.mealPlanService.updateMealPlan(this.mealPlan.id, this.editMealPlan).subscribe({
+      next: (updatedPlan) => {
+        this.mealPlan = updatedPlan;
+        this.showEditMealPlanForm = false;
+        this.isUpdating = false;
+        this.error = undefined;
+        this.success = 'Meal plan updated successfully!';
+        setTimeout(() => this.success = undefined, 3000);
+      },
+      error: (err) => {
+        this.error = err.error || 'Failed to update meal plan';
+        this.isUpdating = false;
+      }
+    });
+  }
+
+  deleteMealPlan() {
+    if (!this.mealPlan) return;
+    
+    if (confirm('Are you sure you want to delete this meal plan? This action cannot be undone.')) {
+      this.isDeleting = true;
+      this.error = undefined;
+      this.success = undefined;
+
+      this.mealPlanService.deleteMealPlan(this.mealPlan.id).subscribe({
+        next: () => {
+          this.mealPlan = undefined;
+          this.isDeleting = false;
+          this.error = undefined;
+          this.success = 'Meal plan deleted successfully!';
+          setTimeout(() => this.success = undefined, 3000);
+        },
+        error: (err) => {
+          this.error = err.error || 'Failed to delete meal plan';
+          this.isDeleting = false;
+        }
+      });
+    }
+  }
+
   cancelCreateMealPlan() {
     this.showCreateMealPlanForm = false;
     this.resetForm();
+  }
+
+  cancelEditMealPlan() {
+    this.showEditMealPlanForm = false;
+    this.editSelectedRecipes = [];
+    this.editRecipeSearchTerm = '';
   }
 
   resetForm() {
@@ -151,18 +290,6 @@ export class MealPlansComponent implements OnInit {
     };
     this.selectedRecipes = [];
     this.recipeSearchTerm = '';
-  }
-
-  editMealPlan() {
-    // TODO: Implement edit functionality
-    console.log('Edit meal plan functionality to be implemented');
-  }
-
-  deleteMealPlan() {
-    if (confirm('Are you sure you want to delete this meal plan?')) {
-      // TODO: Implement delete functionality
-      console.log('Delete meal plan functionality to be implemented');
-    }
   }
 
   prevWeek() {
