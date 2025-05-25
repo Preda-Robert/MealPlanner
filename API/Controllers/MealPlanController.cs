@@ -34,16 +34,20 @@ public class MealPlansController : BaseAPIController
   [HttpGet("by-range")]
   public async Task<ActionResult<MealPlanDTO?>> GetMealPlanByDateRange(DateTime startDate, DateTime endDate)
   {
-    //var userId = User.GetUserId();
+    try
+    {
+      var userId = User.GetUserId();
 
-    var userId = 1; // Placeholder for user ID, replace with actual logic to get the user ID
+      var result = await _unitOfServices.MealPlanService.GetMealPlanByDateRange(startDate, endDate, userId);
 
-    var result = await _unitOfServices.MealPlanService.GetMealPlanByDateRange(startDate, endDate, userId);
-    if (result.Value == null) return NotFound("No meal plan for the selected week.");
-    return Ok(result.Value);
+      // Return Ok with null value if no meal plan exists
+      // This allows the frontend to show "create meal plan" UI
+      return Ok(result.Value);
+    }
+    catch (Exception ex)
+    {
+      // Return the actual error message for debugging
+      return StatusCode(500, $"Error: {ex.Message}");
+    }
   }
-
-
-
-
 }

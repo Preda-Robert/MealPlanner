@@ -27,10 +27,12 @@ public class MealPlanService : BaseService<MealPlan, MealPlanDTO>, IMealPlanServ
 
     if (mealPlan == null)
     {
-      // Log the error or handle it as needed
-      Console.WriteLine($"No meal plan found for user {userId} between {startDate} and {endDate}");
-      return null;
+      // Log for debugging purposes
+      Console.WriteLine($"No meal plan found for user {userId} between {startDate:yyyy-MM-dd} and {endDate:yyyy-MM-dd}");
 
+      // Return a successful response with null value instead of throwing an error
+      // This allows the frontend to handle the "no meal plan" case gracefully
+      return new ActionResult<MealPlanDTO?>(value: null);
     }
 
     return _mapper.Map<MealPlanDTO>(mealPlan);

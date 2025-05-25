@@ -20,17 +20,40 @@ export class MealPlanService {
   mealPlanParams = signal<MealPlanParams>(new MealPlanParams());
 
   getByDateRange(startDate: Date, endDate: Date) {
-  const userId = this.user?.id ?? 0;
+    const userId = this.user?.id ?? 0;
 
-  return this.http.get<MealPlan>(this.baseUrl + 'mealplans/by-range', {
-    params: {
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-      userId: userId.toString()
-    }
-  });
-}
+    // Format dates to YYYY-MM-DD to avoid timezone issues
+    const formatDate = (date: Date) => {
+      return date.getFullYear() + '-' + 
+             String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+             String(date.getDate()).padStart(2, '0');
+    };
 
+    return this.http.get<MealPlan>(this.baseUrl + 'mealplans/by-range', {
+      params: {
+        startDate: formatDate(startDate),
+        endDate: formatDate(endDate),
+        userId: userId.toString()
+      }
+    });
+  }
+
+  createMealPlan(mealPlan: any) {
+    // Clear cache when creating new meal plan
+    this.mealPlanCache.clear();
+    
+    return this.http.post<MealPlan>(this.baseUrl + 'mealplans', mealPlan);
+  }
+
+  updateMealPlan(id: number, mealPlan: any) {
+    this.mealPlanCache.clear();
+    return this.http.put<MealPlan>(this.baseUrl + 'mealplans/' + id, mealPlan);
+  }
+
+  deleteMealPlan(id: number) {
+    this.mealPlanCache.clear();
+    return this.http.delete(this.baseUrl + 'mealplans/' + id);
+  }
 
   getMealPlans(searchTerm: string = '') {
     const response = this.mealPlanCache.get(Object.values(this.mealPlanParams()).join('-'));
