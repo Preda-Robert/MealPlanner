@@ -64,7 +64,7 @@ export class AuthenticationService {
   }
 
   hasDoneSetup() {
-    const user = this.currentUser();
+    let user = this.currentUser();
     if (user) {
       user.hasDoneSetup = true;
       this.setCurrentUser(user);
@@ -229,5 +229,6 @@ export class AuthenticationService {
     localStorage.removeItem('id_token');
     localStorage.removeItem('user');
     this.currentUser.set(null);
+    localStorage.removeItem('user');
   }
 }

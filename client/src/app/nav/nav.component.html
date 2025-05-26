@@ -18,12 +18,12 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="ingredients" routerLinkActive="true">Ingredients</a>
         </li>
-      @if(authenticationService.currentUser() !== null && authenticationService.currentUser()?.hasDoneSetup === true){
+      @if(authenticationService.currentUser() && authenticationService.currentUser()?.hasDoneSetup === true){
         <li class="nav-item">
           <a class="nav-link" routerLink="/mealplans" routerLinkActive="true">Meal Plans</a>
         </li>
       }
-      @if (authenticationService.currentUser() !== null && authenticationService.currentUser()?.hasDoneSetup === false){
+      @if (authenticationService.currentUser() && authenticationService.currentUser()?.hasDoneSetup === false){
           <li class="nav-item">
             <a class="nav-link" routerLink="/setup-selection" routerLinkActive="true">Setup preferences</a>
           </li>

@@ -14,6 +14,8 @@ import { SaveDietPreference } from '../_models/saveDietPreference';
 import { AuthenticationService } from '../_services/authentication.service';
 import { Allergy } from '../_models/allergy';
 import { PaginatedResult } from '../_models/pagination';
+import { setPaginatedResponse } from '../_services/paginationHelper';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-setup-selection',
@@ -47,8 +49,6 @@ export class SetupSelectionComponent implements OnInit {
 
   loadAllergies() {
     this.allergyService.getAllergies();
-        this.allergyService.getAllergies();
-            this.allergyService.getAllergies();
   }
 
   loadDietTypes() {
