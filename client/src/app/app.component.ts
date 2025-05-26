@@ -17,14 +17,13 @@ export class AppComponent implements OnInit {
   private authenticationService = inject(AuthenticationService);
 
   ngOnInit(){
-    if(localStorage.getItem('user') !== null)
+    if(localStorage.getItem('id_token') === null && this.authenticationService.currentUser() === null) {
+      this.googleApiService.configure();
+      this.googleApiService.handleLoginRedirect();
+    }
+    else
     {
-      const currentUser = JSON.parse(localStorage.getItem('user')!);
-      this.authenticationService.currentUser.set(currentUser);
-      if(this.authenticationService.currentUser()?.hasDoneSetup === false)
-      {
-        this.router.navigate(['/setup-selection']);
-      }
+      this.googleApiService.idToken.set(localStorage.getItem('id_token') || '');
     }
   }
 }
