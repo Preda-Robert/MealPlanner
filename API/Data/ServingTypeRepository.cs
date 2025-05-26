@@ -14,7 +14,8 @@ public class ServingTypeRepository : BaseRepository<ServingType>, IServingTypeRe
 
     public override async Task<ICollection<ServingType>> GetAllAsync()
     {
-        // only return the first 10 records
-        return await _dbSet.Take(10).ToListAsync();
+        var query = _context.Set<ServingType>().Where(st => st.Official == true);
+        return await query
+            .ToListAsync();
     }
 }

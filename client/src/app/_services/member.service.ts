@@ -38,16 +38,14 @@ export class MemberService {
   }
 
   loadMember() {
-    console.log('Here is the user '+ this.user()?.userName);
-    console.log('Here is the member '+ this.member());
     return this.http.get<Member>(this.baseUrl + 'users/' + this.user()?.userName).pipe(
       tap((member: Member) => {
+        console.log('Member loaded:', member);
         this.member.set(member);
       })
     );
   }
 
-  // to do
   getMembers() {
     const response = this.memberCache.get(Object.values(this.userParams()).join('-'));
 

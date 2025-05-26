@@ -11,8 +11,8 @@ const oAuthConfig: AuthConfig = {
   scope: 'openid profile email',
 }
 
-export interface  UserProfile{
-  info : {
+export interface UserProfile {
+  info: {
     sub: string,
     name: string,
     email: string,
@@ -24,16 +24,23 @@ export interface  UserProfile{
   providedIn: 'root'
 })
 export class GoogleApiService {
-    private readonly oAuthService = inject(OAuthService);
-    idToken = signal<string | null>(null);
+  private readonly oAuthService = inject(OAuthService);
+  idToken = signal<string | null>(null);
+  private _isAuthReady = signal<boolean>(false);
+  isAuthReady = this._isAuthReady.asReadonly();
 
   constructor() {
-      this.configure();
-      //this.handleLoginRedirect();
+    this.oAuthService.configure(oAuthConfig);
   }
 
   configure(): void {
-    this.oAuthService.configure(oAuthConfig);
+    this.oAuthService.loadDiscoveryDocumentAndTryLogin().then(() => {
+      if (this.oAuthService.hasValidAccessToken()) {
+        const token = this.oAuthService.getIdToken();
+        this.idToken.set(token);
+      }
+      this._isAuthReady.set(true);
+    });
   }
 
   handleLoginRedirect(): void {
@@ -42,15 +49,15 @@ export class GoogleApiService {
         if (this.oAuthService.hasValidAccessToken()) {
           const token = this.oAuthService.getIdToken();
           this.idToken.set(token);
-          //console.log('OAuth successful, idToken:', token);
         }
       });
     });
   }
 
-  loginWithGoogle(): void {
-    console.log('Logging in with Google...');
-    this.oAuthService.initLoginFlow();
+  oAuthDiscovery(): void {
+    this.oAuthService.loadDiscoveryDocumentAndLogin().then(() => {
+      this.oAuthService.initLoginFlow();
+    });
   }
 
   logOut(): void {

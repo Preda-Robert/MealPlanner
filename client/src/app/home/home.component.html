@@ -12,6 +12,10 @@
       {
         <p class="lead text-muted mb-4">
           Welcome back, {{authenticationService.currentUser()?.userName}}!
+          @if(authenticationService.currentUser()?.hasDoneSetup === false)
+          {
+            <span class="text-warning">Please complete your setup to get the most out of MealPlanner.</span>
+          }
         </p>
       } @else
       {
@@ -19,7 +23,10 @@
           Join our community of food lovers and start your culinary journey today!
         </p>
       <div class="d-flex justify-content-center justify-content-md-start gap-3 mb-3">
-        <a class="btn btn-primary btn-lg" routerLink="/auth" routerLinkActive="true" >Get Started</a>
+        @if(authenticationService.currentUser() === null)
+        {
+          <a class="btn btn-primary btn-lg" routerLink="/auth" routerLinkActive="true" >Get Started</a>
+        }
         <a class="btn btn-outline-secondary btn-lg " routerLink="/learn-more" routerLinkActive="true">Learn More</a>
       </div>
       <p class="text-muted small">

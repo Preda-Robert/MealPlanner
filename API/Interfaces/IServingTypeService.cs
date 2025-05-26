@@ -7,5 +7,5 @@ namespace API.Interfaces;
 
 public interface IServingTypeService : IBaseService<ServingType, ServingTypeDTO>
 {
-
+    
 }

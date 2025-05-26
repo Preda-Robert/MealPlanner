@@ -7,8 +7,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarColor01">
       <ul class="navbar-nav me-auto">
-      @if(authenticationService.currentUser() === null || authenticationService.currentUser()?.hasDoneSetup === true)
-      {
+
 
         <li class="nav-item">
           <a class="nav-link" routerLink="/recipes" routerLinkActive="true">Recipes</a>
@@ -19,11 +18,12 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="ingredients" routerLinkActive="true">Ingredients</a>
         </li>
+      @if(authenticationService.currentUser() !== null && authenticationService.currentUser()?.hasDoneSetup === true){
         <li class="nav-item">
           <a class="nav-link" routerLink="/mealplans" routerLinkActive="true">Meal Plans</a>
         </li>
       }
-      @else if (authenticationService.currentUser() !== null && authenticationService.currentUser()?.hasDoneSetup === false){
+      @if (authenticationService.currentUser() !== null && authenticationService.currentUser()?.hasDoneSetup === false){
           <li class="nav-item">
             <a class="nav-link" routerLink="/setup-selection" routerLinkActive="true">Setup preferences</a>
           </li>

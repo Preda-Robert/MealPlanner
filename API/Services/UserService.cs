@@ -111,7 +111,17 @@ public class UserService : BaseService<ApplicationUser, UserDTO>, IUserService
     public async Task<ActionResult<MemberDTO>> GetUserByUsernameAsync(string username, bool isCurrentUser = false)
     {
         var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username, isCurrentUser);
-        if(user == null)
+        var dietaryPreference = await _unitOfWork.DietaryPreferenceRepository.GetDietaryPreferenceByUserId(user!.Id);
+        if (dietaryPreference != null)
+        {
+            user.DietaryPreferences = dietaryPreference;
+        }
+        else
+        {
+
+            throw new BadHttpRequestException("Dietary preference not found for user");
+        }
+        if (user == null)
         {
             return new BadRequestObjectResult("User not found");
         }

@@ -21,7 +21,6 @@ export class AllergyService {
 
   getAllergies() {
     const response = this.allergyCache.get(Object.values(this.allergyParams()).join('-'));
-
     if (response !== undefined) {
       return setPaginatedResponse(response, this.paginatedResult);
     }

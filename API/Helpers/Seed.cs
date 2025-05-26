@@ -111,6 +111,7 @@ public class Seed
         }
         foreach (var servingType in servingTypesList!)
         {
+            servingType.Official = true; 
             await unitOfServices.ServingTypeService.Create(servingType);
         }
     }

@@ -1,6 +1,7 @@
 using System;
 using API.DTO;
 using API.Entities;
+using API.Extensions;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +25,8 @@ public class DietaryPreferenceController : BaseAPIController
     [HttpPost("save")]
     public async Task<ActionResult> SaveDietaryPreference(SaveDietPreferenceDTO saveDietPreferenceDTO)
     {
-        var dietaryPreferenceServiceResult = await _unitOfServices.DietaryPreferenceService.SaveDietaryPreference(saveDietPreferenceDTO);
+        var userId = User.GetUserId();
+        var dietaryPreferenceServiceResult = await _unitOfServices.DietaryPreferenceService.SaveDietaryPreference(userId, saveDietPreferenceDTO);
         return dietaryPreferenceServiceResult;
     }
 

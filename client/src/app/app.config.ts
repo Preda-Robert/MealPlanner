@@ -1,7 +1,7 @@
 import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { OAuthModule } from 'angular-oauth2-oidc';
+import { OAuthModule, provideOAuthClient } from 'angular-oauth2-oidc';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideToastr } from 'ngx-toastr';
@@ -19,8 +19,10 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptors([errorInterceptor, jwtInterceptor, loadingInterceptor])),
     provideAnimations(),
+    provideOAuthClient(),
     provideToastr({
-      positionClass: 'toast-bottom-right'
+      positionClass: 'toast-bottom-right',
+      preventDuplicates: true,
     }),
     importProvidersFrom(NgxSpinner, TimeagoModule.forRoot(), ModalModule.forRoot(), OAuthModule.forRoot()) // ngx spinner does not have a provider, neither does timeago, so we import it from the module
   ]

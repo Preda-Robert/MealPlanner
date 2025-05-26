@@ -34,6 +34,7 @@ export const routes: Routes = [
       {path: 'setup-selection', component: SetupSelectionComponent}
     ]
   },
+  {path: 'setup-selection', component: SetupSelectionComponent},
   {path: 'errors', component: TestErrorsComponent},
   {path: 'not-found', component: NotFoundComponent},
   {path: 'server-error', component: ServerErrorComponent},
