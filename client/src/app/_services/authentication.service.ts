@@ -7,13 +7,13 @@ import { environment } from '../../environments/environment.development';
 import { FavoritesService } from './favorites.service';
 import { throwError } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
-import { CookieService } from 'ngx-cookie-service';
 import { EmailVerification } from '../_models/emailVerification';
 import { ResetPasswordRequest } from '../_models/password-reset';
 import { GoogleApiService } from './google-api.service';
 import { RegisterResponse } from '../_models/registerResponse';
 import { DietaryPreference } from '../_models/dietaryPreference';
 import { SaveDietPreference } from '../_models/saveDietPreference';
+import { Router } from '@angular/router';
 
 
 @Injectable({
@@ -25,7 +25,7 @@ export class AuthenticationService {
   private favoritesService = inject(FavoritesService);
   private toastr = inject(ToastrService);
   private googleapiService = inject(GoogleApiService);
-  private googleAuthenticated : boolean = false;
+  private router = inject(Router);
 
   baseUrl = environment.apiUrl;
   currentUser = signal<User | null>(null);
@@ -41,11 +41,15 @@ export class AuthenticationService {
   constructor() {
     effect(() => {
       const idToken = this.googleapiService.idToken();
-      if(!this.googleAuthenticated && idToken) {
+      if(this.currentUser() === null && idToken) {
+        localStorage.setItem('id_token', idToken);
         this.googleLogin(idToken).subscribe({
           next: user => {
             if (user) {
-              this.googleAuthenticated = true;
+              this.setCurrentUser(user);
+              if(user.hasDoneSetup === false) {
+                this.router.navigateByUrl('/setup-selection');
+              }
             }
           },
           error: error => {
@@ -54,9 +58,18 @@ export class AuthenticationService {
         });
       }
       else if (idToken === null) {
-        this.googleAuthenticated = false;
+        localStorage.removeItem('id_token');
       }
     });
+  }
+
+  hasDoneSetup() {
+    let user = this.currentUser();
+    if (user) {
+      user.hasDoneSetup = true;
+      this.setCurrentUser(user);
+    }
+    return false;
   }
 
 
@@ -111,15 +124,10 @@ export class AuthenticationService {
   }
 
   googleLogin(idToken: string) {
-    //console.log('googleLogin method called with idToken:', idToken);
-    //console.log('Sending Google login request to:', this.baseUrl + 'authentication/google-auth');
     const token = { IdToken: idToken };
-    //.log('Request payload:', token);
-    //console.log('API baseUrl:', this.baseUrl);
 
     return this.http.post<User>(this.baseUrl + 'authentication/google-auth', token).pipe(
       map(user => {
-        //console.log('HTTP response received:', user);
         if (user) {
           this.setCurrentUser(user);
           localStorage.setItem('user', JSON.stringify(user));
@@ -147,13 +155,9 @@ export class AuthenticationService {
 
     return this.http.post<RegisterResponse>(this.baseUrl + 'authentication/register', model).pipe(
       map(response => {
-        //console.log('Raw registration response:', response);
-
         return response;
       }),
       catchError(error => {
-        //console.error('Registration error in service:', error);
-
         if (error.status === 400) {
           if (typeof error.error === 'string') {
             this.toastr.error(error.error);
@@ -170,31 +174,10 @@ export class AuthenticationService {
     );
   }
 
-  doneSelection(dietpreferences : SaveDietPreference) {
-    this.logout();
-    let user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user && user.id) {
-      this.http.get<User>(this.baseUrl + 'user/' + user.id).subscribe({
-        next: (response) => {
-          if (response) {
-            user = response;
-            user.hasDoneSetup = true;
-            this.setCurrentUser(user);
-            localStorage.setItem('user', JSON.stringify(user));
-          }
-        }
-      });
-    }
-    user = JSON.parse(localStorage.getItem('user') || '{}');
-    this.currentUser.set(user);
-    this.toastr.info('Please log in again to update your profile');
-  }
-
-
   setCurrentUser(user: User) {
-    localStorage.setItem('user', JSON.stringify(user));
     this.currentUser.set(user);
-    this.favoritesService.getLikeIds();
+    this.refreshUserData();
+    localStorage.setItem('user', JSON.stringify(user));
   }
 
   refreshUserData() {
@@ -243,7 +226,9 @@ export class AuthenticationService {
 
   logout() {
     this.googleapiService.logOut();
+    localStorage.removeItem('id_token');
     localStorage.removeItem('user');
     this.currentUser.set(null);
+    localStorage.removeItem('user');
   }
 }

@@ -7,7 +7,7 @@ import { AuthenticationService } from '../_services/authentication.service';
 import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-nav',
-  imports: [FormsModule, BsDropdownModule, RouterLink, RouterLinkActive, HasRoleDirective],
+  imports: [FormsModule, BsDropdownModule, RouterLink, RouterLinkActive],
   templateUrl: './nav.component.html',
   styleUrl: './nav.component.css'
 })

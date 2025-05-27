@@ -9,6 +9,7 @@ import { memberDetailedResolver } from './_resolvers/member-detailed.resolver';
 import { adminGuard } from './_guards/admin.guard';
 import { LearnMoreComponent } from './learn-more/learn-more.component';
 import { AuthComponent } from './auth/auth.component';
+import { MealPlansComponent } from './mealplans/mealplans.component';
 import { VerificationComponent } from './verification/verification.component';
 import { MemberDetailComponent } from './members/member-detail/member-detail.component';
 import { IngredientsComponent } from './ingredients/ingredients.component';
@@ -27,6 +28,7 @@ export const routes: Routes = [
       {path: 'verify-email', component: VerificationComponent},
       {path: 'ingredients', component: IngredientsComponent},
       {path: 'recipes', component: RecipesComponent},
+      {path: 'mealplans', component: MealPlansComponent },
       {path: 'cookwares', component: CookwaresComponent},
       {path: 'member-details', component: MemberDetailComponent, resolve: {member: memberDetailedResolver}, canActivate: [authGuard]},
       {path: 'setup-selection', component: SetupSelectionComponent}

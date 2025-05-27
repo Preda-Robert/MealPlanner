@@ -7,5 +7,5 @@ namespace API.Interfaces;
 
 public interface IDietaryPreferenceService : IBaseService<DietaryPreferences, DietaryPreferenceDTO>
 {
-    Task<ActionResult> SaveDietaryPreference(SaveDietPreferenceDTO saveDietPreferenceDTO);
+    Task<ActionResult> SaveDietaryPreference(int userId, SaveDietPreferenceDTO saveDietPreferenceDTO);
 }

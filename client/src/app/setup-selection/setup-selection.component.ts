@@ -12,6 +12,10 @@ import { DietTypeService } from '../_services/diet-type.service';
 import { DietPreferenceService } from '../_services/diet-preference.service';
 import { SaveDietPreference } from '../_models/saveDietPreference';
 import { AuthenticationService } from '../_services/authentication.service';
+import { Allergy } from '../_models/allergy';
+import { PaginatedResult } from '../_models/pagination';
+import { setPaginatedResponse } from '../_services/paginationHelper';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-setup-selection',
@@ -37,9 +41,14 @@ export class SetupSelectionComponent implements OnInit {
   servingTypes: ServingType[] = [];
 
   ngOnInit(): void {
-    this.allergyService.getAllergies();
+    this.loadAllergies();
     this.loadDietTypes();
     this.loadServingTypes();
+    this.loadAllergies();
+  }
+
+  loadAllergies() {
+    this.allergyService.getAllergies();
   }
 
   loadDietTypes() {
@@ -58,6 +67,7 @@ export class SetupSelectionComponent implements OnInit {
       error: (err) => console.error('Error loading diet types:', err)
     });
   }
+
 
   loadServingTypes() {
     this.servingTypeService.getServingTypes().subscribe({
@@ -94,7 +104,6 @@ export class SetupSelectionComponent implements OnInit {
     console.log('Selected Serving Type ID:', this.selectedServingTypeId);
 
     const dietPreference: SaveDietPreference = {
-      userId: this.authenticationService.currentUser()?.id || 0,
       dietTypeId: this.selectedDietTypeId,
       servingTypeId: this.selectedServingTypeId,
       allergies: Array.from(this.selectedAllergies),
@@ -102,8 +111,8 @@ export class SetupSelectionComponent implements OnInit {
 
     this.dietaryPreferenceService.saveDietPreferences(dietPreference).subscribe({
       next: () => {
-        this.router.navigate(['/home']);
-        this.authenticationService.doneSelection(dietPreference);
+        this.authenticationService.hasDoneSetup();
+        this.router.navigate(['/']);
       },
       error: (error) => {
         console.error('Failed to save preferences', error);
@@ -111,7 +120,6 @@ export class SetupSelectionComponent implements OnInit {
     });
   }
 
-  // Modified to use index-based selection instead of ID-based selection
   toggleAllergySelection(id: number) {
     this.selectedAllergies.has(id)
       ? this.selectedAllergies.delete(id)

@@ -6,6 +6,7 @@ import { AllergyParams } from '../_models/allergyParams';
 import { PaginatedResult } from '../_models/pagination';
 import { AuthenticationService } from './authentication.service';
 import { setPaginatedResponse, setPaginationHeaders } from './paginationHelper';
+import { tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,20 +22,19 @@ export class AllergyService {
 
   getAllergies() {
     const response = this.allergyCache.get(Object.values(this.allergyParams()).join('-'));
-
     if (response !== undefined) {
-      return setPaginatedResponse(response, this.paginatedResult);
+      setPaginatedResponse(response, this.paginatedResult);
     }
-
     let params = setPaginationHeaders(this.allergyParams().pageNumber, this.allergyParams().pageSize);
-    params = params.append('searchTerm', this.allergyParams().searchTerm);
-
-    return this.http.get<Allergy[]>(this.baseUrl + 'allergies', { observe: 'response', params }).subscribe(
-      {
-        next: response => {
-          setPaginatedResponse(response, this.paginatedResult);
-          this.allergyCache.set(Object.values(this.allergyParams()).join('-'), response);
-        }
-      });
+    params = params.append('searchTerm', this.allergyParams().searchTerm || '');
+    this.http.get<Allergy[]>(this.baseUrl + 'allergies', { observe: 'response', params }).subscribe({
+      next: (response) => {
+        this.allergyCache.set(Object.values(this.allergyParams()).join('-'), response);
+        setPaginatedResponse(response, this.paginatedResult);
+      },
+      error: (error) => {
+        console.error('Error loading allergies:', error);
+      }
+    });
   }
 }

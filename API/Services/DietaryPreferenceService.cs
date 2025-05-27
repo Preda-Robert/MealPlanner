@@ -14,16 +14,16 @@ public class DietaryPreferenceService : BaseService<DietaryPreferences, DietaryP
     {
     }
 
-    public async Task<ActionResult> SaveDietaryPreference(SaveDietPreferenceDTO saveDietPreferenceDTO)
+    public async Task<ActionResult> SaveDietaryPreference(int userId, SaveDietPreferenceDTO saveDietPreferenceDTO)
     {
-        var user = await _unitOfWork.UserRepository.GetByIdAsync(saveDietPreferenceDTO.UserId);
+        var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
         if (user == null)
         {
             return new NotFoundObjectResult("User not found");
         }
         
         // First check if there's an existing preference and delete it
-        var existingPreference = await _unitOfWork.DietaryPreferenceRepository.GetDietaryPreferenceByUserId(saveDietPreferenceDTO.UserId);
+        var existingPreference = await _unitOfWork.DietaryPreferenceRepository.GetDietaryPreferenceByUserId(userId);
         if (existingPreference != null)
         {
             _unitOfWork.DietaryPreferenceRepository.Delete(existingPreference);
@@ -46,11 +46,12 @@ public class DietaryPreferenceService : BaseService<DietaryPreferences, DietaryP
         
         var dietaryPreference = new DietaryPreferences
         {
-            UserId = saveDietPreferenceDTO.UserId,
+            UserId = userId,
             DietTypeId = saveDietPreferenceDTO.DietTypeId,
+            DietType = dietType, 
             ServingTypeId = saveDietPreferenceDTO.ServingTypeId,
-            // Don't assign navigation properties here - EF will handle relationships
-            Allergies = new List<Allergy>()
+            ServingType = servingType, 
+            Allergies = []
         };
         
         // Add allergies
@@ -63,17 +64,14 @@ public class DietaryPreferenceService : BaseService<DietaryPreferences, DietaryP
             }
         }
         
-        // Update user setup status
         user.HasDoneSetup = true;
+        await _unitOfWork.DietaryPreferenceRepository.AddAsync(dietaryPreference);
+        await _unitOfWork.SaveAsync();
+        user.DietaryPreferences = dietaryPreference;
         await _unitOfWork.UserRepository.UpdateAsync(user);
         
-        // Add new dietary preference - DON'T call Update on it
-        await _unitOfWork.DietaryPreferenceRepository.AddAsync(dietaryPreference);
-        
-        // Save all changes at once
         await _unitOfWork.SaveAsync();
         
-        // Return the mapped result
         return new OkObjectResult(_mapper.Map<DietaryPreferenceDTO>(dietaryPreference));
     }
 }

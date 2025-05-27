@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-recipes',
-  imports: [TabsModule, NgClass, PaginationModule, FormsModule, ViewRecipeComponent],
+  imports: [TabsModule, NgClass, PaginationModule, FormsModule],
   templateUrl: './recipes.component.html',
   styleUrl: './recipes.component.css'
 })

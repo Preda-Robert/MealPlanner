@@ -6,6 +6,7 @@ import { TextInputComponent } from "../_forms/text-input/text-input.component";
 import { CommonModule } from '@angular/common';
 import { GoogleApiService } from '../_services/google-api.service';
 import { User } from '../_models/user';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-auth',
@@ -22,6 +23,7 @@ export class AuthComponent implements OnInit {
   isLoginMode = true;
   authForm!: FormGroup;
   validationErrors: string[] | undefined;
+  toastr = inject(ToastrService);
 
   ngOnInit(): void {
     this.buildForm();
@@ -59,64 +61,89 @@ export class AuthComponent implements OnInit {
   }
 
   loginWithGoogle() {
-    console.log('loginWithGoogle');
-    this.googleService.loginWithGoogle();
+    this.googleService.oAuthDiscovery();
   }
 
   onSubmit() {
     if (this.isLoginMode) {
+      this.login();
+    } else {
+      this.register();
+    }
+  }
+
+  login() {
+    if (this.authForm.valid) {
       const credentials = {
         usernameOrEmail: this.authForm.value.usernameOrEmail,
-        password: this.authForm.value.password
+        password: this.authForm.value.password,
       };
+
       this.authenticationService.login(credentials).subscribe({
-        next: (user) => {
-          console.log('User:', user);
-          if (user && user.emailConfirmed === false) {
-            console.log('User is not verified');
-            sessionStorage.setItem('pendingLoginCredentials', JSON.stringify(credentials));
-            sessionStorage.setItem('verificationUserId', user.id.toString());
-            this.router.navigate(['/verify-email']);
-          } else if (user && user.emailConfirmed === true && user.hasDoneSetup === true) {
-            this.router.navigate(['/member-details']);
-          }
-          else if (user && user.emailConfirmed === true && user.hasDoneSetup === false) {
+        next: () => {
+          if (this.authenticationService.currentUser()?.hasDoneSetup === false) {
             this.router.navigate(['/setup-selection']);
           }
-          if(typeof user === 'undefined')
+          else
           {
-            this.validationErrors = ['Invalid username or password'];
+            this.router.navigate(['/']);
           }
-
         },
-        error: err => {
-        if (err?.status === 401 || err?.status === 400) {
-            this.validationErrors = ['Invalid username or password'];
+        error: error => {
+          if (error && error.requiresVerification) {
+            sessionStorage.setItem('pendingLoginCredentials', JSON.stringify(credentials));
+            this.router.navigateByUrl('/verify-email');
           } else {
-            const fallback = err?.error?.message || err?.message || 'Something went wrong';
-            this.validationErrors = [fallback];
+            this.validationErrors = typeof error === 'string' ? [error] : ['Login failed'];
           }
         }
       });
-    } else {
+    }
+  }
+
+  register() {
+    if (this.authForm.valid) {
+      this.validationErrors = undefined;
+
+      console.log('Submitting registration form:', this.authForm.value);
+
       this.authenticationService.register(this.authForm.value).subscribe({
-        next: (registerResponse) => {
-          if(registerResponse && registerResponse.requireEmailVerification !== false)
-          {
-            sessionStorage.setItem('pendingLoginCredentials', JSON.stringify(this.authForm.value));
-            sessionStorage.setItem('verificationUserId', registerResponse.userId.toString());
-          }
-          this.validationErrors = undefined;
-          this.router.navigate(['/verify-email']);
-        },
-        error: err => {
-          if (err?.status === 401 || err?.status === 400) {
-              this.validationErrors = ['Invalid username or password'];
+        next: response => {
+          console.log('Registration response:', response);
+
+          if (response.requireEmailVerification) {
+            console.log('Email confirmation required, userId:', response.userId);
+
+            if (response.userId) {
+              sessionStorage.setItem('verificationUserId', response.userId.toString());
+              this.toastr.info('Please verify your email. Check your inbox for a verification code.');
+
+              setTimeout(() => {
+                this.router.navigateByUrl('/verify-email');
+              }, 500);
             } else {
-              const fallback = err?.error?.message || err?.message || 'Something went wrong';
-              this.validationErrors = [fallback];
+              console.error('No userId in response:', response);
+              this.toastr.error('Registration completed but verification is not available');
             }
+          } else {
+            this.toastr.success('Registration successful!');
+            if(this.authenticationService.currentUser()?.hasDoneSetup === false) {
+              this.router.navigateByUrl('/setup-selection');
+            }
+            this.router.navigateByUrl('/');
           }
+        },
+        error: error => {
+          console.error('Registration error:', error);
+
+          if (typeof error === 'string') {
+            this.validationErrors = [error];
+          } else if (Array.isArray(error)) {
+            this.validationErrors = error;
+          } else {
+            this.validationErrors = ['Registration failed. Please try again.'];
+          }
+        }
       });
     }
   }
